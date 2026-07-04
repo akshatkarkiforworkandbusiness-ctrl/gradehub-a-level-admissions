@@ -1,26 +1,100 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Design System — Editorial Ink
+ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-source-serif-4);
+
+  --color-bg-page: var(--bg-page);
+  --color-bg-surface: var(--bg-surface);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-ink-navy: var(--ink-navy);
+  --color-ink-red: var(--ink-red);
+  --color-ink-red-text: var(--ink-red-text);
+
+  /* Fallback aliases to prevent completely breaking any un-audited components */
+  --color-background: var(--bg-page);
+  --color-foreground: var(--text-primary);
+  --color-muted: var(--bg-surface);
+  --color-muted-foreground: var(--text-secondary);
+  --color-accent: var(--ink-navy);
+  --color-accent-foreground: var(--ink-navy-foreground);
+  --color-card: var(--bg-surface);
+  --color-card-foreground: var(--text-primary);
+  --color-input: var(--bg-surface);
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg-page: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --border: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --ink-navy: #1E293B;
+    --ink-navy-foreground: #F8FAFC;
+    --ink-red: #0EA5E9;
+    --ink-red-text: #0EA5E9;
+  }
+
+  .dark {
+    --bg-page: #0F172A;
+    --bg-surface: #1E293B;
+    --border: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --ink-navy: #F1F5F9;
+    --ink-navy-foreground: #0F172A;
+    --ink-red: #38BDF8;
+    --ink-red-text: #38BDF8;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Force number inputs to not show spinners (cleaner UI) */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-bg-surface backdrop-blur-xl border border-border shadow-sm;
+  }
+
+  .btn-premium {
+    @apply bg-ink-red text-[#FAFAF6] hover:brightness-110 shadow-lg shadow-ink-red/20 transition-all active:scale-[0.98];
+  }
+
+  .input-premium {
+    @apply bg-bg-surface border border-border text-text-primary placeholder:text-text-secondary
+           focus:border-ink-navy focus:ring-2 focus:ring-ink-navy/20 focus:outline-none transition-all;
+  }
+}
+
+/* Smooth theme transitions */
+html {
+  transition: color-scheme 0.3s ease;
+}
+
+/* Select dropdowns in dark mode */
+.dark select option {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
 }
