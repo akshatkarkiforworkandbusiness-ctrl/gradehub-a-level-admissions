@@ -4,82 +4,148 @@ import { useState } from "react";
 import { Plus, X, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { Select } from "@/components/ui/select";
+import { SubjectSearchCombobox } from "@/components/ui/subject-search-combobox";
+import { CreditType, detectSubjectCredit } from "@/lib/calculators";
 import { motion, AnimatePresence } from "framer-motion";
 
-const POPULAR_SUBJECTS = [
-  "Accounting", "Afrikaans", "Agriculture", "Ancient History", "Applied ICT", 
-  "Arabic", "Archaeology", "Architecture", "Art and Design", "Bengali", 
-  "Biblical Hebrew", "Biology", "Business Studies", "Chemistry", 
-  "Chinese (Mandarin)", "Classical Civilisation", "Classical Greek", 
-  "Classical Studies", "Computer Science", "Criminology", "Dance", 
-  "Design and Technology", "Digital Media", "Divinity", "Drama and Theatre Studies", 
-  "Economics", "Electronics", "Engineering", "English General Paper", 
-  "English Language", "English Language and Literature", "English Literature", 
-  "Environmental Science", "Film Studies", "Food Preparation and Nutrition", 
-  "French", "Further Mathematics", "Geography", "Geology", "German", 
-  "Global Perspectives and Research", "Gujarati", "Health and Social Care", 
-  "Hindi", "Hinduism", "History", "History of Art", "Information Technology", 
-  "Islamic Studies", "Italian", "Japanese", "Latin", "Law", 
-  "Marine Science", "Mathematics", "Media Studies", "Modern Hebrew", 
-  "Music", "Music Technology", "Panjabi", "Persian", "Philosophy", 
-  "Photography", "Physical Education", "Physics", "Polish", "Politics", 
-  "Portuguese", "Psychology", "Religious Studies", "Russian", "Sociology", 
-  "Spanish", "Statistics", "Tamil", "Textiles", "Thinking Skills", 
-  "Travel and Tourism", "Turkish", "Urdu"
-];
+interface SelectedSubject {
+  name: string;
+  creditType: CreditType;
+}
 
 const DEGREE_REQUIREMENTS = [
   {
-    name: "Medicine / Dentistry",
+    name: "Medicine & Surgery (MBBS)",
     requires: ["Chemistry", "Biology"],
     niceToHave: ["Mathematics", "Physics"],
     tier: "Highly Competitive"
   },
   {
-    name: "Engineering (General)",
+    name: "Dentistry (BDS)",
+    requires: ["Chemistry", "Biology"],
+    niceToHave: ["Mathematics", "Physics"],
+    tier: "Highly Competitive"
+  },
+  {
+    name: "Veterinary Science",
+    requires: ["Chemistry", "Biology"],
+    niceToHave: ["Mathematics", "Physics"],
+    tier: "Highly Competitive"
+  },
+  {
+    name: "Engineering (General / Mechanical / Civil)",
     requires: ["Mathematics", "Physics"],
     niceToHave: ["Further Mathematics", "Chemistry"],
     tier: "Competitive"
   },
   {
-    name: "Computer Science",
+    name: "Chemical Engineering",
+    requires: ["Mathematics", "Chemistry"],
+    niceToHave: ["Physics", "Further Mathematics"],
+    tier: "Competitive"
+  },
+  {
+    name: "Computer Science & AI",
     requires: ["Mathematics"],
     niceToHave: ["Further Mathematics", "Computer Science", "Physics"],
     tier: "Highly Competitive"
   },
   {
-    name: "Economics",
+    name: "Mathematics & Statistics",
+    requires: ["Mathematics"],
+    niceToHave: ["Further Mathematics", "Physics"],
+    tier: "Competitive"
+  },
+  {
+    name: "Physics & Astrophysics",
+    requires: ["Mathematics", "Physics"],
+    niceToHave: ["Further Mathematics"],
+    tier: "Competitive"
+  },
+  {
+    name: "Chemistry",
+    requires: ["Chemistry", "Mathematics"],
+    niceToHave: ["Physics", "Biology"],
+    tier: "Standard"
+  },
+  {
+    name: "Biological & Biomedical Sciences",
+    requires: ["Biology", "Chemistry"],
+    niceToHave: ["Mathematics", "Physics"],
+    tier: "Standard"
+  },
+  {
+    name: "Economics & Econometrics",
     requires: ["Mathematics"],
     niceToHave: ["Economics", "Further Mathematics"],
     tier: "Competitive"
   },
   {
-    name: "Law",
+    name: "Finance, Accounting & Business",
     requires: [],
-    niceToHave: ["History", "English Literature", "Essay Subject"],
-    tier: "Competitive"
-  },
-  {
-    name: "Psychology",
-    requires: ["A Science Subject"],
-    niceToHave: ["Psychology", "Mathematics"],
+    niceToHave: ["Mathematics", "Economics", "Accounting"],
     tier: "Standard"
   },
   {
-    name: "Architecture",
+    name: "Law (LLB)",
     requires: [],
-    niceToHave: ["Art & Design", "Mathematics", "Physics"],
+    niceToHave: ["History", "English Literature", "Law"],
+    tier: "Competitive"
+  },
+  {
+    name: "Psychology (BSc)",
+    requires: ["A Science Subject"],
+    niceToHave: ["Psychology", "Mathematics", "Biology"],
+    tier: "Standard"
+  },
+  {
+    name: "Architecture (BA/BSc)",
+    requires: [],
+    niceToHave: ["Art and Design", "Mathematics", "Physics"],
+    tier: "Standard"
+  },
+  {
+    name: "History & International History",
+    requires: [],
+    niceToHave: ["History", "English Literature", "Politics"],
+    tier: "Standard"
+  },
+  {
+    name: "English Literature & Creative Writing",
+    requires: ["English Literature"],
+    niceToHave: ["History", "French", "German", "Spanish"],
+    tier: "Standard"
+  },
+  {
+    name: "Politics & International Relations",
+    requires: [],
+    niceToHave: ["Politics", "History", "Economics"],
+    tier: "Standard"
+  },
+  {
+    name: "Geography & Environmental Science",
+    requires: [],
+    niceToHave: ["Geography", "Biology", "Environmental Science"],
+    tier: "Standard"
+  },
+  {
+    name: "Modern Languages & Linguistics",
+    requires: [],
+    niceToHave: ["French", "German", "Spanish", "English Language"],
     tier: "Standard"
   }
 ];
 
 export default function SubjectMatcher() {
-  const [subjects, setSubjects] = useState<string[]>(["Mathematics", "Physics", "Chemistry"]);
+  const [subjects, setSubjects] = useState<SelectedSubject[]>([
+    { name: "Mathematics", creditType: "Full Credit" },
+    { name: "Physics", creditType: "Full Credit" },
+    { name: "Chemistry", creditType: "Full Credit" }
+  ]);
 
   const addSubject = () => {
-    if (subjects.length < 4) {
-      setSubjects([...subjects, "Biology"]);
+    if (subjects.length < 5) {
+      setSubjects([...subjects, { name: "Biology", creditType: "Full Credit" }]);
     }
   };
 
@@ -87,28 +153,41 @@ export default function SubjectMatcher() {
     setSubjects(subjects.filter((_, i) => i !== idx));
   };
 
-  const updateSubject = (idx: number, val: string) => {
+  const updateSubject = (idx: number, name: string, creditType?: CreditType) => {
     const newSubs = [...subjects];
-    newSubs[idx] = val;
+    const detected = detectSubjectCredit(name);
+    newSubs[idx] = { 
+      name: detected.cleanSubject, 
+      creditType: creditType || detected.creditType 
+    };
     setSubjects(newSubs);
   };
 
-  const isScience = (sub: string) => ["Biology", "Chemistry", "Physics", "Mathematics", "Psychology"].includes(sub);
+  const isScience = (sub: string) => ["Biology", "Chemistry", "Physics", "Mathematics", "Psychology", "Further Mathematics"].includes(sub);
 
   const getMatches = () => {
+    const fullCreditNames = subjects.filter(s => s.creditType === "Full Credit").map(s => s.name);
+    const allNames = subjects.map(s => s.name);
+
     return DEGREE_REQUIREMENTS.map(degree => {
       let isMatch = true;
       let missingReqs: string[] = [];
 
       degree.requires.forEach(req => {
         if (req === "A Science Subject") {
-          if (!subjects.some(s => isScience(s))) {
+          if (!fullCreditNames.some(s => isScience(s))) {
+            isMatch = false;
+            missingReqs.push("Science Subject (Full A-Level)");
+          }
+        } else if (!fullCreditNames.includes(req)) {
+          // Check if user has it only as half credit (AS-Level)
+          if (allNames.includes(req)) {
+            isMatch = false;
+            missingReqs.push(`${req} (Requires Full A-Level, not AS)`);
+          } else {
             isMatch = false;
             missingReqs.push(req);
           }
-        } else if (!subjects.includes(req)) {
-          isMatch = false;
-          missingReqs.push(req);
         }
       });
 
@@ -123,11 +202,11 @@ export default function SubjectMatcher() {
   return (
     <main className="max-w-4xl mx-auto px-6 pt-12">
       <div className="mb-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-6">
-          Most Popular Tool
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
+          Russell Group "Informed Choices" Standard
         </div>
-        <h1 className="text-4xl md:text-5xl font-serif mb-4 text-foreground">Subject Matcher</h1>
-        <p className="text-muted-foreground text-lg">Enter your A-Level subjects to see which university degree paths are open to you.</p>
+        <h1 className="text-4xl md:text-5xl font-serif mb-4 text-foreground">Degree Subject Matcher</h1>
+        <p className="text-muted-foreground text-lg">Search subjects and select Full Credit (Full A-Level) or Half Credit (AS-Level) to see which degrees unlock.</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
@@ -144,22 +223,27 @@ export default function SubjectMatcher() {
                     exit={{ opacity: 0, height: 0 }}
                     className="flex items-center gap-2"
                   >
-                    <Select value={sub} onChange={(e) => updateSubject(idx, e.target.value)}>
-                      {POPULAR_SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-                    </Select>
-                    <button onClick={() => removeSubject(idx)} className="p-2 text-muted-foreground hover:text-red-500 transition-colors">
+                    <div className="flex-1">
+                      <SubjectSearchCombobox
+                        value={sub.name}
+                        creditType={sub.creditType}
+                        onChange={(name, _, detectedCredit) => updateSubject(idx, name, detectedCredit)}
+                        onCreditToggle={(newCredit) => updateSubject(idx, sub.name, newCredit)}
+                      />
+                    </div>
+                    <button onClick={() => removeSubject(idx)} className="p-2 text-muted-foreground hover:text-red-500 transition-colors shrink-0">
                       <X size={18} />
                     </button>
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
-            {subjects.length < 4 && (
+            {subjects.length < 5 && (
               <button 
                 onClick={addSubject}
                 className="mt-4 w-full py-2 border border-dashed border-border rounded-lg text-sm text-muted-foreground hover:text-accent hover:border-accent flex items-center justify-center gap-2 transition-colors"
               >
-                <Plus size={16} /> Add 4th Subject
+                <Plus size={16} /> Add Subject
               </button>
             )}
           </Card>
@@ -179,7 +263,7 @@ export default function SubjectMatcher() {
                 </Card>
               ))}
               {successfulMatches.length === 0 && (
-                <p className="text-muted-foreground text-sm p-4">Add some standard subjects like Maths or Sciences to see paths open up.</p>
+                <p className="text-muted-foreground text-sm p-4">Add Full Credit A-Level subjects like Maths or Sciences to see degree paths open up.</p>
               )}
             </div>
           </div>

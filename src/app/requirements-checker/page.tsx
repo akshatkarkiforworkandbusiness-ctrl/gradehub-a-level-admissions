@@ -4,28 +4,31 @@ import { useState, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ExternalLink, Globe, Search, Loader2 } from "lucide-react";
+import { ExternalLink, Globe, Search, Loader2, Info } from "lucide-react";
 
 const UK_UNIVERSITIES = [
-  { name: "University of Oxford", offer: "A*A*A", pts: 160, url: "https://ox.ac.uk" },
-  { name: "University of Cambridge", offer: "A*A*A", pts: 160, url: "https://cam.ac.uk" },
-  { name: "Imperial College London", offer: "A*AA", pts: 152, url: "https://imperial.ac.uk" },
-  { name: "UCL (University College London)", offer: "AAA", pts: 144, url: "https://ucl.ac.uk" },
-  { name: "University of Edinburgh", offer: "AAA", pts: 144, url: "https://ed.ac.uk" },
-  { name: "King's College London", offer: "AAB", pts: 136, url: "https://kcl.ac.uk" },
-  { name: "University of Manchester", offer: "AAB", pts: 136, url: "https://manchester.ac.uk" },
-  { name: "University of Warwick", offer: "AAB", pts: 136, url: "https://warwick.ac.uk" },
-  { name: "University of Bristol", offer: "AAB", pts: 136, url: "https://bristol.ac.uk" },
-  { name: "University of Nottingham", offer: "ABB", pts: 128, url: "https://nottingham.ac.uk" },
-  { name: "University of Leeds", offer: "ABB", pts: 128, url: "https://leeds.ac.uk" },
-  { name: "Cardiff University", offer: "BBB", pts: 120, url: "https://cardiff.ac.uk" },
+  { name: "University of Oxford", offer: "A*A*A", pts: 160, acceptsTariff: false, url: "https://ox.ac.uk" },
+  { name: "University of Cambridge", offer: "A*A*A", pts: 160, acceptsTariff: false, url: "https://cam.ac.uk" },
+  { name: "Imperial College London", offer: "A*AA", pts: 152, acceptsTariff: false, url: "https://imperial.ac.uk" },
+  { name: "UCL (University College London)", offer: "AAA", pts: 144, acceptsTariff: false, url: "https://ucl.ac.uk" },
+  { name: "University of Edinburgh", offer: "AAA", pts: 144, acceptsTariff: true, url: "https://ed.ac.uk" },
+  { name: "King's College London", offer: "AAB", pts: 136, acceptsTariff: true, url: "https://kcl.ac.uk" },
+  { name: "University of Manchester", offer: "AAB", pts: 136, acceptsTariff: true, url: "https://manchester.ac.uk" },
+  { name: "University of Warwick", offer: "AAB", pts: 136, acceptsTariff: true, url: "https://warwick.ac.uk" },
+  { name: "University of Bristol", offer: "AAB", pts: 136, acceptsTariff: true, url: "https://bristol.ac.uk" },
+  { name: "University of Nottingham", offer: "ABB", pts: 128, acceptsTariff: true, url: "https://nottingham.ac.uk" },
+  { name: "University of Leeds", offer: "ABB", pts: 128, acceptsTariff: true, url: "https://leeds.ac.uk" },
+  { name: "Cardiff University", offer: "BBB", pts: 120, acceptsTariff: true, url: "https://cardiff.ac.uk" },
+  { name: "University of Exeter", offer: "AAB", pts: 136, acceptsTariff: true, url: "https://exeter.ac.uk" },
+  { name: "University of Southampton", offer: "AAB", pts: 136, acceptsTariff: true, url: "https://southampton.ac.uk" },
+  { name: "University of Birmingham", offer: "AAA", pts: 144, acceptsTariff: true, url: "https://birmingham.ac.uk" },
 ];
 
 const US_UNIVERSITIES = [
-  { name: "Ivy League & Elite (Harvard, MIT, Stanford)", gpa: 3.9, url: "https://commonapp.org" },
-  { name: "Top Tier (UCLA, Berkeley, UMich)", gpa: 3.7, url: "https://commonapp.org" },
-  { name: "Highly Competitive State Schools", gpa: 3.5, url: "https://commonapp.org" },
-  { name: "Standard State Universities", gpa: 3.0, url: "https://commonapp.org" },
+  { name: "Ivy League & Elite (Harvard, MIT, Stanford, Yale)", gpa: 3.9, url: "https://commonapp.org" },
+  { name: "Top Tier Publics (UCLA, UC Berkeley, UMich)", gpa: 3.7, url: "https://commonapp.org" },
+  { name: "Highly Competitive State Schools (UIUC, UNC, UW)", gpa: 3.5, url: "https://commonapp.org" },
+  { name: "Standard State Universities & Colleges", gpa: 3.0, url: "https://commonapp.org" },
 ];
 
 const POPULAR_DESTINATIONS = [
@@ -67,7 +70,8 @@ function RequirementsContent() {
     setLoading(true);
     setError("");
 
-    fetch(`http://universities.hipolabs.com/search?country=${encodeURIComponent(selectedCountry)}`)
+    // Secure HTTPS endpoint
+    fetch(`https://universities.hipolabs.com/search?country=${encodeURIComponent(selectedCountry)}`)
       .then(res => {
         if (!res.ok) throw new Error("Failed to fetch universities");
         return res.json();
@@ -104,12 +108,12 @@ function RequirementsContent() {
             onClick={() => setActiveRegion(region)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
               activeRegion === region 
-                ? "bg-accent text-accent-foreground" 
+                ? "bg-accent text-accent-foreground shadow-sm" 
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
-            {region === "UK" && "UK (UCAS Points)"}
-            {region === "US" && "US (GPA)"}
+            {region === "UK" && "UK Universities"}
+            {region === "US" && "US Universities (GPA)"}
             {region === "Global Explorer" && "Global Explorer (All Countries)"}
           </button>
         ))}
@@ -133,15 +137,25 @@ function RequirementsContent() {
       <div className="space-y-8">
         {activeRegion === "UK" && (
           <>
+            <div className="bg-muted p-4 rounded-xl border border-border flex items-start gap-3 text-xs text-muted-foreground mb-6">
+              <Info size={16} className="text-accent shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-foreground">Official Entry Guidance:</strong> Highly selective UK universities (e.g. Oxford, Cambridge, Imperial, UCL) demand <em>exact grade profiles</em> (e.g. A*A*A) rather than total UCAS tariff points alone.
+              </div>
+            </div>
+
             <div>
-              <h3 className="font-semibold text-lg mb-4 text-ink-navy">Likely Eligible (Meets Typical Offer)</h3>
+              <h3 className="font-semibold text-lg mb-4 text-ink-navy">Likely Eligible (Meets Typical Offer Points)</h3>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {UK_UNIVERSITIES.filter(u => pts >= u.pts).map(u => (
                   <Card key={u.name} className="p-5 border-border hover:border-ink-navy transition-colors">
                     <h4 className="font-semibold text-foreground mb-1">{u.name}</h4>
-                    <div className="text-xs text-muted-foreground mb-3">Typical Offer: {u.offer}</div>
+                    <div className="text-xs text-muted-foreground mb-1">Typical Offer: <strong className="text-foreground">{u.offer}</strong> ({u.pts} pts)</div>
+                    <div className="text-[10px] text-muted-foreground mb-3">
+                      {u.acceptsTariff ? "Accepts UCAS Tariff Points" : "Requires Exact Grade Profile"}
+                    </div>
                     <a href={u.url} target="_blank" rel="noreferrer" className="text-xs text-accent hover:underline flex items-center gap-1">
-                      Visit Website <ExternalLink size={12} />
+                      Visit Official Site <ExternalLink size={12} />
                     </a>
                   </Card>
                 ))}
@@ -149,7 +163,7 @@ function RequirementsContent() {
             </div>
 
             <div className="pt-8 border-t border-border">
-              <h3 className="font-semibold text-lg mb-4 text-muted-foreground">Aspirational (Below Typical Offer)</h3>
+              <h3 className="font-semibold text-lg mb-4 text-muted-foreground">Aspirational (Below Typical Offer Points)</h3>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 opacity-75">
                 {UK_UNIVERSITIES.filter(u => pts < u.pts).map(u => (
                   <Card key={u.name} className="p-5 bg-muted/50 border-border shadow-none">
@@ -164,7 +178,7 @@ function RequirementsContent() {
 
         {activeRegion === "US" && (
           <div>
-            <h3 className="font-semibold text-lg mb-4">Target Universities by GPA</h3>
+            <h3 className="font-semibold text-lg mb-4">Target US Universities by GPA</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               {US_UNIVERSITIES.map(u => (
                 <Card key={u.name} className={`p-5 ${gpaNum >= u.gpa ? "border-border hover:border-ink-navy transition-colors" : "opacity-75 bg-bg-page border-border"}`}>
@@ -178,7 +192,7 @@ function RequirementsContent() {
                 </Card>
               ))}
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">US Universities evaluate applications holistically. A high GPA does not guarantee admission.</p>
+            <p className="mt-4 text-xs text-muted-foreground">US Universities evaluate applications holistically (GPA, SAT/ACT, essays, and extracurriculars).</p>
           </div>
         )}
 
@@ -186,7 +200,7 @@ function RequirementsContent() {
           <div className="space-y-6">
             <div className="bg-muted p-4 rounded-xl border border-border">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Note:</strong> Exact A-Level entry requirements vary by specific course and are not centrally standardized outside the UK/US. Browse the official directories below to check requirements on each university's official site.
+                <strong className="text-foreground">Official Global Database:</strong> Browse accredited universities across all major international study destinations. Check course-specific entry requirements directly on official university web pages.
               </p>
             </div>
 
@@ -225,7 +239,7 @@ function RequirementsContent() {
                   <p>Fetching universities for {selectedCountry}...</p>
                 </div>
               ) : error ? (
-                <div className="text-ink-red-text py-8 text-center bg-bg-surface rounded-xl border border-ink-red">
+                <div className="text-ink-red-text py-8 text-center bg-bg-surface rounded-xl border border-ink-red text-sm">
                   Failed to load universities: {error}
                 </div>
               ) : (

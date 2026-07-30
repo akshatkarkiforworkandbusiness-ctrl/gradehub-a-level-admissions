@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Target, FileText, Upload, Plus, Trash2 } from "lucide-react";
+import { ArrowRight, Target, FileText, Upload, Plus, Trash2, Info, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ export default function GradePredictor() {
   const [currentUms, setCurrentUms] = useState<string>("160");
   const [maxUms, setMaxUms] = useState<string>("200");
   const [totalA2Ums, setTotalA2Ums] = useState<string>("400");
-  const [targetGrade, setTargetGrade] = useState<string>("A");
+  const [targetGrade, setTargetGrade] = useState<string>("A*");
 
   // Report Form State
   const [studentName, setStudentName] = useState("");
@@ -66,21 +66,8 @@ export default function GradePredictor() {
   const maxUmsNum = parseFloat(maxUms) || 0;
   const totalA2UmsNum = parseFloat(totalA2Ums) || 0;
 
-  const requiredRemaining = predictRequiredUms(currentUmsNum, totalA2UmsNum, targetGrade);
-  const remainingAvailable = totalA2UmsNum - maxUmsNum;
-  
-  const isPossible = requiredRemaining !== null && requiredRemaining <= remainingAvailable;
-  
-  let resultMessage = "";
-  if (requiredRemaining === null) {
-    resultMessage = "Invalid parameters.";
-  } else if (!isPossible) {
-    resultMessage = "Mathematically impossible. You need more marks than are available in the remaining exams.";
-  } else if (requiredRemaining === 0) {
-    resultMessage = "You've already secured enough marks for this grade!";
-  } else {
-    resultMessage = `You need ${requiredRemaining.toFixed(1)} more UMS marks in your remaining exams to achieve a grade ${targetGrade}.`;
-  }
+  const prediction = predictRequiredUms(currentUmsNum, maxUmsNum, totalA2UmsNum, targetGrade);
+  const remainingAvailable = Math.max(0, totalA2UmsNum - maxUmsNum);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,8 +95,8 @@ export default function GradePredictor() {
       maxUms,
       totalA2Ums,
       targetGrade,
-      requiredRemaining: requiredRemaining?.toFixed(1) || "N/A",
-      isPossible,
+      requiredRemaining: prediction.requiredRemainingUms?.toFixed(1) || "N/A",
+      isPossible: prediction.isPossible,
       // Subject Specific
       subjects
     };
@@ -120,8 +107,11 @@ export default function GradePredictor() {
   return (
     <main className="max-w-4xl mx-auto px-6 pt-12 pb-24">
       <div className="mb-12">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
+          Pearson Edexcel & CAIE Official UMS Standard
+        </div>
         <h1 className="text-4xl md:text-5xl font-serif mb-4 text-foreground">A-Level Grade Predictor</h1>
-        <p className="text-muted-foreground text-lg">Using the Uniform Mark Scale (UMS) system for International A-Levels (CAIE/Edexcel). Calculate exactly what you need in your A2 exams.</p>
+        <p className="text-muted-foreground text-lg">Calculate remaining UMS marks needed in A2 exams using official awarding body regulations (including the 90% A2 rule for A*).</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
@@ -134,7 +124,7 @@ export default function GradePredictor() {
             
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Total UMS achieved so far (e.g. your AS marks)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Total UMS achieved so far (AS Level marks)</label>
                 <Input 
                   type="number" 
                   value={currentUms} 
@@ -144,7 +134,7 @@ export default function GradePredictor() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Max UMS for exams taken so far</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Max UMS for exams taken so far (AS Level max UMS)</label>
                 <Input 
                   type="number" 
                   value={maxUms} 
@@ -154,10 +144,11 @@ export default function GradePredictor() {
               </div>
 
               <div className="pt-6 border-t border-border">
-                <label className="block text-sm font-medium text-foreground mb-2">Total UMS for the full A-Level (usually 400 or 600)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Total UMS for Full A-Level</label>
                 <Select value={totalA2Ums} onChange={(e) => setTotalA2Ums(e.target.value)} className="max-w-xs">
-                  <option value="400">400 (4 Units)</option>
-                  <option value="600">600 (6 Units)</option>
+                  <option value="400">400 UMS (4-Unit Course e.g. IAL Maths, Physics)</option>
+                  <option value="600">600 UMS (6-Unit Course e.g. IAL Chemistry, Biology)</option>
+                  <option value="200">200 UMS (2-Unit AS Course)</option>
                 </Select>
               </div>
 
@@ -167,6 +158,17 @@ export default function GradePredictor() {
                   {Object.keys(UMS_BOUNDARIES).map(g => <option key={g} value={g}>{g}</option>)}
                 </Select>
               </div>
+
+              {targetGrade === 'A*' && (
+                <div className="p-4 bg-muted/60 border border-border rounded-xl text-xs text-muted-foreground space-y-2">
+                  <div className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
+                    <Info size={16} className="text-accent" />
+                    Official A* Rule (Pearson Edexcel & CAIE):
+                  </div>
+                  <p>1. <strong>Overall Grade A:</strong> Must achieve at least 80% total UMS across full A-Level.</p>
+                  <p>2. <strong>A2 Unit Mastery:</strong> Must achieve at least 90% in A2 units specifically.</p>
+                </div>
+              )}
             </div>
           </Card>
 
@@ -317,19 +319,28 @@ export default function GradePredictor() {
         <div>
           <div className="sticky top-24">
             <Card className="overflow-hidden border-border">
-              <div className={`p-6 md:p-8 ${isPossible ? 'bg-ink-navy text-[#FAFAF6]' : 'bg-ink-red text-[#FAFAF6]'}`}>
-                <div className="text-sm font-medium uppercase tracking-wider mb-2 opacity-80">Required Marks</div>
+              <div className={`p-6 md:p-8 ${prediction.isPossible ? 'bg-ink-navy text-[#FAFAF6]' : 'bg-ink-red text-[#FAFAF6]'}`}>
+                <div className="text-sm font-medium uppercase tracking-wider mb-2 opacity-80">Required A2 UMS</div>
                 <div className="text-6xl font-serif mb-2">
-                  {requiredRemaining !== null && isPossible ? requiredRemaining.toFixed(0) : "N/A"}
+                  {prediction.requiredRemainingUms !== null && prediction.isPossible ? prediction.requiredRemainingUms.toFixed(0) : "N/A"}
                 </div>
                 <div className="text-sm opacity-90">
-                  / {remainingAvailable} remaining UMS
+                  / {remainingAvailable} remaining A2 UMS
                 </div>
               </div>
               <div className="p-6 space-y-4">
-                <p className={`text-sm leading-relaxed ${isPossible ? 'text-muted-foreground' : 'text-red-500 font-medium'}`}>
-                  {resultMessage}
+                <p className={`text-sm leading-relaxed ${prediction.isPossible ? 'text-muted-foreground' : 'text-red-500 font-medium'}`}>
+                  {prediction.message}
                 </p>
+
+                {prediction.breakdown && (
+                  <div className="pt-3 border-t border-border text-xs text-muted-foreground space-y-1">
+                    <div className="font-semibold text-foreground">Detailed Dual-Rule Breakdown:</div>
+                    <div>• For 80% Overall (Grade A): {prediction.breakdown.overallA2NeededFor80} A2 UMS</div>
+                    <div>• For 90% A2 Rule: {prediction.breakdown.a2NeededFor90Rule} A2 UMS</div>
+                  </div>
+                )}
+
                 <div className="pt-4 border-t border-border">
                   <Link href="/ucas-calculator" className="flex items-center justify-between text-sm text-muted-foreground hover:text-accent group transition-colors">
                     Calculate total UCAS Points

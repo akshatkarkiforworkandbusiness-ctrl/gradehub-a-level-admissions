@@ -1,20 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, ArrowRight } from "lucide-react";
+import { Plus, X, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { 
   QualificationType, 
   QualificationEntry, 
   calculateTotalUcasPoints,
+  getExactEquivalentOffer,
+  getCreditLabel,
+  getCreditWeight,
   A_LEVEL_POINTS,
   AS_LEVEL_POINTS,
   EPQ_POINTS,
   IB_HL_POINTS,
-  BTEC_EXT_POINTS
+  IB_SL_POINTS,
+  IB_TOK_EE_POINTS,
+  BTEC_EXT_POINTS,
+  BTEC_DIP_POINTS,
+  BTEC_EXT_CERT_POINTS,
+  T_LEVEL_POINTS
 } from "@/lib/calculators";
+import { SubjectSearchCombobox } from "@/components/ui/subject-search-combobox";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -23,28 +31,48 @@ const QUAL_OPTIONS: Record<QualificationType, string[]> = {
   "AS-Level": Object.keys(AS_LEVEL_POINTS),
   "EPQ": Object.keys(EPQ_POINTS),
   "IB-HL": Object.keys(IB_HL_POINTS),
+  "IB-SL": Object.keys(IB_SL_POINTS),
+  "IB-Tok-EE": Object.keys(IB_TOK_EE_POINTS),
   "BTEC-Ext-Dip": Object.keys(BTEC_EXT_POINTS),
+  "BTEC-Dip": Object.keys(BTEC_DIP_POINTS),
+  "BTEC-Ext-Cert": Object.keys(BTEC_EXT_CERT_POINTS),
+  "T-Level": Object.keys(T_LEVEL_POINTS),
+};
+
+const QUAL_LABELS: Record<QualificationType, string> = {
+  "A-Level": "A-Level (Full Credit)",
+  "AS-Level": "AS-Level (Half Credit)",
+  "EPQ": "EPQ (Half Credit)",
+  "IB-HL": "IB Higher Level",
+  "IB-SL": "IB Standard Level",
+  "IB-Tok-EE": "IB Theory of Knowledge / EE",
+  "BTEC-Ext-Dip": "BTEC Extended Diploma",
+  "BTEC-Dip": "BTEC Diploma",
+  "BTEC-Ext-Cert": "BTEC Extended Certificate",
+  "T-Level": "T-Level Qualification"
 };
 
 export default function UcasCalculator() {
   const [entries, setEntries] = useState<QualificationEntry[]>([
-    { id: "1", type: "A-Level", subject: "Mathematics", grade: "A" }
+    { id: "1", type: "A-Level", subject: "Mathematics", grade: "A", creditType: "Full Credit" }
   ]);
 
   const addEntry = () => {
-    setEntries([...entries, { id: Date.now().toString(), type: "A-Level", subject: "", grade: "A" }]);
+    setEntries([...entries, { id: Date.now().toString(), type: "A-Level", subject: "", grade: "A", creditType: "Full Credit" }]);
   };
 
   const removeEntry = (id: string) => {
     setEntries(entries.filter((e) => e.id !== id));
   };
 
-  const updateEntry = (id: string, field: keyof QualificationEntry, value: string) => {
+  const updateEntry = (id: string, updates: Partial<QualificationEntry>) => {
     setEntries(entries.map((e) => {
       if (e.id === id) {
-        const updated = { ...e, [field]: value };
-        if (field === "type") {
-          updated.grade = QUAL_OPTIONS[value as QualificationType][0];
+        const updated = { ...e, ...updates };
+        if (updates.type && QUAL_OPTIONS[updates.type]) {
+          if (!QUAL_OPTIONS[updates.type].includes(updated.grade)) {
+            updated.grade = QUAL_OPTIONS[updates.type][0];
+          }
         }
         return updated;
       }
@@ -53,67 +81,83 @@ export default function UcasCalculator() {
   };
 
   const totalPoints = calculateTotalUcasPoints(entries);
-
-  const getEquivalentOffer = (pts: number) => {
-    if (pts >= 168) return "A*A*A*";
-    if (pts >= 152) return "A*AA";
-    if (pts >= 144) return "AAA";
-    if (pts >= 128) return "ABB";
-    if (pts >= 112) return "BBC";
-    if (pts >= 96) return "CCC";
-    return "Below CCC";
-  };
+  const equivalentOffer = getExactEquivalentOffer(totalPoints);
 
   return (
     <main className="max-w-4xl mx-auto px-6 pt-12">
       <div className="mb-12">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
+          Official UCAS 2026/2027 Tariff
+        </div>
         <h1 className="text-4xl md:text-5xl font-serif mb-4 text-foreground">Calculate UCAS Points</h1>
-        <p className="text-muted-foreground text-lg">Add your qualifications below to instantly see your total tariff points for UK university entry.</p>
+        <p className="text-muted-foreground text-lg">Search any A-Level or AS subject below. The system automatically detects Full Credit vs. Half Credit qualifications.</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
           <AnimatePresence>
-            {entries.map((entry) => (
-              <motion.div 
-                key={entry.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="group flex flex-wrap sm:flex-nowrap items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm transition-all hover:border-accent/30 hover:shadow-md"
-              >
-                <div className="w-full sm:flex-1 min-w-[120px]">
-                  <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Qualification</label>
-                  <Select value={entry.type} onChange={(e) => updateEntry(entry.id, "type", e.target.value)}>
-                    {Object.keys(QUAL_OPTIONS).map(q => <option key={q} value={q}>{q}</option>)}
-                  </Select>
-                </div>
-                
-                <div className="w-full sm:w-40 min-w-[120px]">
-                  <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Subject</label>
-                  <Input 
-                    value={entry.subject} 
-                    onChange={(e) => updateEntry(entry.id, "subject", e.target.value)} 
-                    placeholder="e.g. History"
-                    className="bg-transparent border-none shadow-none px-0 font-medium text-foreground focus:ring-0"
-                  />
-                </div>
+            {entries.map((entry) => {
+              const creditLabel = getCreditLabel(entry);
+              const creditWeight = getCreditWeight(entry);
 
-                <div className="w-24 shrink-0">
-                  <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Grade</label>
-                  <Select value={entry.grade} onChange={(e) => updateEntry(entry.id, "grade", e.target.value)} className="font-semibold text-accent">
-                    {QUAL_OPTIONS[entry.type].map(g => <option key={g} value={g}>{g}</option>)}
-                  </Select>
-                </div>
-
-                <button 
-                  onClick={() => removeEntry(entry.id)}
-                  className="shrink-0 p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors mt-5 sm:mt-0"
+              return (
+                <motion.div 
+                  key={entry.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="group flex flex-wrap sm:flex-nowrap items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm transition-all hover:border-accent/30 hover:shadow-md"
                 >
-                  <X size={20} />
-                </button>
-              </motion.div>
-            ))}
+                  <div className="w-full sm:flex-1 min-w-[200px]">
+                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 flex items-center justify-between">
+                      <span>Search Subject</span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                        creditLabel === "Full Credit" ? "bg-blue-600/10 text-blue-600" : "bg-amber-500/10 text-amber-600"
+                      }`}>
+                        {creditLabel} ({creditWeight} Credit)
+                      </span>
+                    </label>
+                    <SubjectSearchCombobox
+                      value={entry.subject}
+                      type={entry.type}
+                      creditType={entry.creditType || creditLabel}
+                      onChange={(subj, detectedType, detectedCredit) => {
+                        updateEntry(entry.id, {
+                          subject: subj,
+                          type: detectedType || entry.type,
+                          creditType: detectedCredit || entry.creditType
+                        });
+                      }}
+                      onCreditToggle={(newCredit) => {
+                        const newType = newCredit === "Half Credit" ? "AS-Level" : "A-Level";
+                        updateEntry(entry.id, {
+                          creditType: newCredit,
+                          type: newType
+                        });
+                      }}
+                    />
+                  </div>
+
+                  <div className="w-28 shrink-0">
+                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Grade</label>
+                    <Select 
+                      value={entry.grade} 
+                      onChange={(e) => updateEntry(entry.id, { grade: e.target.value })} 
+                      className="font-semibold text-accent"
+                    >
+                      {QUAL_OPTIONS[entry.type]?.map(g => <option key={g} value={g}>{g}</option>)}
+                    </Select>
+                  </div>
+
+                  <button 
+                    onClick={() => removeEntry(entry.id)}
+                    className="shrink-0 p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors mt-5 sm:mt-0"
+                  >
+                    <X size={20} />
+                  </button>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
 
           <button 
@@ -131,8 +175,9 @@ export default function UcasCalculator() {
               <div className="bg-ink-navy text-[#FAFAF6] p-6 md:p-8">
                 <div className="opacity-80 text-sm font-medium uppercase tracking-wider mb-2">Total UCAS Points</div>
                 <div className="text-6xl font-serif mb-4">{totalPoints}</div>
-                <div className="opacity-80 text-sm">
-                  Equivalent to <span className="text-accent-foreground font-semibold">{getEquivalentOffer(totalPoints)}</span> at A-Level
+                <div className="opacity-90 text-sm flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-accent" />
+                  Equivalent Offer Profile: <span className="text-accent-foreground font-bold">{equivalentOffer}</span>
                 </div>
               </div>
               <div className="p-6 space-y-4">

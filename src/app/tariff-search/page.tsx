@@ -3,14 +3,30 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { A_LEVEL_POINTS, AS_LEVEL_POINTS, EPQ_POINTS, IB_HL_POINTS, BTEC_EXT_POINTS } from "@/lib/calculators";
+import { 
+  A_LEVEL_POINTS, 
+  AS_LEVEL_POINTS, 
+  EPQ_POINTS, 
+  IB_HL_POINTS, 
+  IB_SL_POINTS,
+  IB_TOK_EE_POINTS,
+  BTEC_EXT_POINTS,
+  BTEC_DIP_POINTS,
+  BTEC_EXT_CERT_POINTS,
+  T_LEVEL_POINTS
+} from "@/lib/calculators";
 
 const DIRECTORY = [
   ...Object.entries(A_LEVEL_POINTS).map(([grade, pts]) => ({ qual: "A-Level", grade, pts })),
   ...Object.entries(AS_LEVEL_POINTS).map(([grade, pts]) => ({ qual: "AS-Level", grade, pts })),
-  ...Object.entries(EPQ_POINTS).map(([grade, pts]) => ({ qual: "EPQ", grade, pts })),
-  ...Object.entries(IB_HL_POINTS).map(([grade, pts]) => ({ qual: "IB Higher Level", grade, pts })),
-  ...Object.entries(BTEC_EXT_POINTS).map(([grade, pts]) => ({ qual: "BTEC Extended Diploma", grade, pts })),
+  ...Object.entries(EPQ_POINTS).map(([grade, pts]) => ({ qual: "EPQ (Extended Project)", grade, pts })),
+  ...Object.entries(IB_HL_POINTS).map(([grade, pts]) => ({ qual: "IB Higher Level (HL)", grade, pts })),
+  ...Object.entries(IB_SL_POINTS).map(([grade, pts]) => ({ qual: "IB Standard Level (SL)", grade, pts })),
+  ...Object.entries(IB_TOK_EE_POINTS).map(([grade, pts]) => ({ qual: "IB Theory of Knowledge / EE", grade, pts })),
+  ...Object.entries(BTEC_EXT_POINTS).map(([grade, pts]) => ({ qual: "BTEC Extended Diploma (180)", grade, pts })),
+  ...Object.entries(BTEC_DIP_POINTS).map(([grade, pts]) => ({ qual: "BTEC Diploma (120)", grade, pts })),
+  ...Object.entries(BTEC_EXT_CERT_POINTS).map(([grade, pts]) => ({ qual: "BTEC Extended Cert (60)", grade, pts })),
+  ...Object.entries(T_LEVEL_POINTS).map(([grade, pts]) => ({ qual: "T-Level", grade, pts })),
 ];
 
 export default function TariffSearch() {
@@ -25,8 +41,11 @@ export default function TariffSearch() {
   return (
     <main className="max-w-4xl mx-auto px-6 pt-12">
       <div className="mb-12">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
+          Official UCAS 2026/2027 Database
+        </div>
         <h1 className="text-4xl md:text-5xl font-serif mb-4 text-foreground">UCAS Tariff Directory</h1>
-        <p className="text-muted-foreground text-lg">Search the database of all qualification grades and their exact UCAS point values.</p>
+        <p className="text-muted-foreground text-lg">Search the complete directory of official UK qualification grades and their exact UCAS point values.</p>
       </div>
 
       <div className="relative mb-8 max-w-xl flex items-center">

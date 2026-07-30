@@ -1,59 +1,89 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Moon, Sun, Calculator } from "lucide-react"
-import { useTheme } from "next-themes"
-import Link from 'next/link';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
+import { Moon, Sun, BookmarkPlus, User, Calendar } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { setTheme, theme, resolvedTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // Ensure hydration match
-  const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if (!mounted) {
-    return <div className="w-9 h-9 rounded-lg border border-border bg-bg-surface"></div>
-  }
+  if (!mounted) return null;
 
   return (
     <button
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="relative p-2 rounded-lg border border-border bg-bg-surface text-ink-navy hover:bg-border/50 transition-colors flex items-center justify-center w-9 h-9"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:border-slate-600 transition-colors text-xs font-semibold"
+      aria-label="Toggle theme"
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
+      {theme === "dark" ? <Sun size={14} className="text-amber-400" /> : <Moon size={14} className="text-blue-400" />}
+      <span>{theme === "dark" ? "Light" : "Dark"}</span>
     </button>
-  )
+  );
 }
 
 export function Navbar() {
+  const pathname = usePathname();
+
+  const links = [
+    { href: "/profile", label: "My Profile" },
+    { href: "/action-plan", label: "Action Plan" },
+    { href: "/ucas-calculator", label: "UCAS Points" },
+    { href: "/gpa-converter", label: "Global GPA" },
+    { href: "/grade-predictor", label: "Grade Predictor" },
+    { href: "/university-draftlist", label: "Draftlist" },
+    { href: "/essay-reviewer", label: "Essay Reviewer" },
+    { href: "/extracurricular-guide", label: "AI Activities" },
+    { href: "/results-day-guide", label: "Results Day" },
+  ];
+
   return (
-    <header className="sticky top-0 w-full border-b border-border bg-bg-page/80 backdrop-blur-md z-50 transition-colors duration-300">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink-red to-blue-600 text-white flex items-center justify-center shadow-md shadow-ink-red/20 group-hover:scale-105 transition-transform">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <circle cx="12" cy="5" r="2" />
-              <path d="M10.5 6.5L4 19" />
-              <path d="M13.5 6.5L20 19" />
-              <path d="M8.5 14h7" opacity="0.6" />
-            </svg>
+    <header className="sticky top-0 z-50 bg-slate-900 text-white border-b border-slate-800 backdrop-blur-md bg-opacity-95 shadow-md">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-serif font-bold text-lg shadow-sm group-hover:bg-blue-500 transition-colors">
+            G
           </div>
-          <div className="flex flex-col -gap-1">
-            <span className="font-bold text-xl tracking-tight text-ink-navy leading-none mt-1 flex items-baseline">After<span className="text-ink-red">A</span>Level<span className="text-ink-red/80 font-semibold ml-[1px]">.com</span></span>
-            <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-text-secondary leading-none mt-[2px]">Assessment Tools</span>
+          <div className="flex flex-col">
+            <span className="font-serif font-bold text-xl tracking-tight text-white leading-none">GradeHub</span>
+            <span className="text-[9px] uppercase tracking-[0.2em] font-semibold text-slate-400 leading-none mt-1">A-Level Global Admissions</span>
           </div>
         </Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-text-secondary">
-          <Link href="/ucas-calculator" className="hover:text-text-primary transition-colors">UCAS Points</Link>
-          <Link href="/gpa-converter" className="hover:text-text-primary transition-colors">GPA Converter</Link>
-          <Link href="/grade-predictor" className="hover:text-text-primary transition-colors">Grade Predictor</Link>
-          <Link href="/subject-matcher" className="hover:text-text-primary transition-colors">Subject Matcher</Link>
-          <Link href="/requirements-checker" className="hover:text-text-primary transition-colors">Requirements</Link>
-          <ThemeToggle />
+
+        <nav className="hidden xl:flex items-center gap-1">
+          {links.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-slate-300 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
+
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Link
+            href="/profile"
+            className="hidden sm:inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm"
+          >
+            <User size={14} /> My Profile
+          </Link>
+        </div>
       </div>
     </header>
   );
