@@ -8,17 +8,16 @@ export type BTECExtCertGrade = 'D*' | 'D' | 'M' | 'P';
 export type TLevelGrade = 'Distinction*' | 'Distinction' | 'Merit' | 'Pass (C+)' | 'Pass (D/E)';
 
 export type CreditType = 'Full Credit' | 'Half Credit';
+export type ExamStatus = 'Completed' | 'Preparing';
 
 export const A_LEVEL_POINTS: Record<string, number> = { 'A*': 56, 'A': 48, 'B': 40, 'C': 32, 'D': 24, 'E': 16, 'U': 0 };
 export const AS_LEVEL_POINTS: Record<string, number> = { 'a': 20, 'b': 16, 'c': 12, 'd': 10, 'e': 6, 'u': 0 };
 export const EPQ_POINTS: Record<string, number> = { 'A*': 28, 'A': 24, 'B': 20, 'C': 16, 'D': 12, 'E': 8, 'U': 0 };
 
-// UCAS 2026/2027 Tariff Reference for IB
 export const IB_HL_POINTS: Record<string, number> = { '7': 56, '6': 48, '5': 32, '4': 24, '3': 12, '2': 0, '1': 0 };
 export const IB_SL_POINTS: Record<string, number> = { '7': 28, '6': 24, '5': 16, '4': 12, '3': 6, '2': 0, '1': 0 };
 export const IB_TOK_EE_POINTS: Record<string, number> = { 'A': 12, 'B': 10, 'C': 8, 'D': 6, 'E': 4 };
 
-// UCAS 2026/2027 Tariff Reference for BTECs
 export const BTEC_EXT_POINTS: Record<string, number> = { 
   'D*D*D*': 168, 'D*D*D': 160, 'D*DD': 152, 'DDD': 144, 'DDM': 128, 'DMM': 112, 'MMM': 96, 'MMP': 80, 'MPP': 64, 'PPP': 48 
 };
@@ -29,12 +28,10 @@ export const BTEC_EXT_CERT_POINTS: Record<string, number> = {
   'D*': 56, 'D': 48, 'M': 32, 'P': 16
 };
 
-// UCAS 2026/2027 Tariff Reference for T-Levels
 export const T_LEVEL_POINTS: Record<string, number> = {
   'Distinction*': 168, 'Distinction': 144, 'Merit': 120, 'Pass (C+)': 96, 'Pass (D/E)': 72
 };
 
-// US WES Credential Evaluation Scales for A-Levels
 export const GPA_SCALES = {
   unweighted: {
     name: "US Unweighted (WES Standard)",
@@ -105,6 +102,7 @@ export interface QualificationEntry {
   subject: string;
   grade: string;
   creditType?: CreditType;
+  examStatus?: ExamStatus;
 }
 
 export function getCreditWeight(entry: QualificationEntry): number {
@@ -214,9 +212,6 @@ export function calculateGermanBavarianGrade(entries: QualificationEntry[]): num
   return Number((total / aLevels.length).toFixed(2));
 }
 
-/**
- * Calculates exact equivalent A-Level grade offer profile dynamically based on subject count.
- */
 export function getExactEquivalentOffer(points: number, subjectCount: number = 3): string {
   if (subjectCount <= 3) {
     if (points >= 168) return "A*A*A*";
@@ -237,7 +232,6 @@ export function getExactEquivalentOffer(points: number, subjectCount: number = 3
     if (points >= 48) return "EE";
     return "Below EE";
   } else {
-    // 4 A-Levels profile
     if (points >= 224) return "A*A*A*A*";
     if (points >= 216) return "A*A*A*A";
     if (points >= 208) return "A*A*AA";

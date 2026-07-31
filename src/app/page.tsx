@@ -14,7 +14,7 @@ import {
   Zap, 
   ArrowRight,
   Sparkles,
-  CheckCircle2
+  BookOpen
 } from "lucide-react";
 import { getStoredProfile, StudentProfile } from "@/lib/profile-store";
 import { calculateTotalUcasPoints } from "@/lib/calculators";
@@ -31,9 +31,16 @@ export default function Home() {
   const TOOLS = [
     {
       title: "Student Admissions Profile",
-      desc: `Configured for ${profile.level} studying ${profile.courseInterest}.`,
+      desc: `Configured for ${profile.level} studying ${profile.courseInterest} with ${profile.entries?.length || 0} subjects enrolled.`,
       href: "/profile",
       badge: profile.level,
+      color: "bg-indigo-600/10 text-indigo-600 border-indigo-600/20"
+    },
+    {
+      title: "Action Plan & Subject Checklists",
+      desc: "Subject revision tabs (Economics, Math, Physics) and university application tracker.",
+      href: "/action-plan",
+      badge: "Revision & App Tasks",
       color: "bg-blue-600/10 text-blue-600 border-blue-600/20"
     },
     {
@@ -59,9 +66,9 @@ export default function Home() {
     },
     {
       title: "Essay Structure Reviewer",
-      desc: "Heuristic diagnostic review for UCAS statements and US Common App essays.",
+      desc: "Diagnostic structure review for UCAS personal statements and Common App essays.",
       href: "/essay-reviewer",
-      badge: "Heuristic Structure Rubric",
+      badge: "Structure Rubric",
       color: "bg-amber-600/10 text-amber-600 border-amber-600/20"
     },
     {
@@ -84,70 +91,72 @@ export default function Home() {
       href: "/grade-predictor",
       badge: "Modular UMS Math",
       color: "bg-emerald-600/10 text-emerald-600 border-emerald-600/20"
-    },
-    {
-      title: "August Results Day Wizard",
-      desc: "Actionable decision flowchart for Met Offer, Exceeded Offer, or Clearing.",
-      href: "/results-day-guide",
-      badge: "Results Day Strategy",
-      color: "bg-amber-500/10 text-amber-600 border-amber-500/20"
     }
   ];
 
   return (
     <main className="max-w-6xl mx-auto px-6 pt-12 pb-24">
-      {/* Real Computed Student Status Dashboard Banner */}
-      <div className="mb-12 p-8 rounded-2xl bg-slate-900 text-white shadow-xl border border-slate-800 space-y-4">
+      {/* Bright Vibrant Hero Dashboard */}
+      <div className="mb-12 p-8 md:p-10 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-600 to-blue-500 text-white shadow-xl shadow-indigo-600/15 space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/20 text-blue-400 text-xs font-bold uppercase tracking-wider border border-blue-600/30">
-            <User size={14} /> Student Admissions Dashboard
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+            <Sparkles size={14} /> Student Admissions Dashboard
           </div>
-          <span className="text-xs text-slate-400 font-mono">Profile Status: Active</span>
+          <span className="text-xs text-indigo-100 font-mono bg-white/10 px-2.5 py-1 rounded-full">{profile.level} Horizon</span>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 pt-2 border-t border-slate-800">
-          <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider block">Student Level & Course</span>
-            <strong className="text-xl font-serif text-white">{profile.level} • {profile.courseInterest}</strong>
+        <div>
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-white mb-2">
+            Welcome back, {profile.studentName || "Scholar"}!
+          </h1>
+          <p className="text-indigo-100 text-sm md:text-base max-w-2xl leading-relaxed">
+            Your personalized hub for {profile.courseInterest} admissions. Track subject revision checklists, calculate global GPAs, and shortlist target universities.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 pt-4 border-t border-white/20">
+          <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-xs">
+            <span className="text-xs text-indigo-100 uppercase tracking-wider block mb-1">Enrolled Subjects</span>
+            <strong className="text-2xl font-serif text-white">{profile.entries?.length || 0} Subjects Tracked</strong>
           </div>
 
-          <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider block">Total Saved UCAS Points</span>
-            <strong className="text-xl font-serif text-blue-400">{totalPoints} Points ({profile.entries?.length || 0} Subjects)</strong>
+          <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-xs">
+            <span className="text-xs text-indigo-100 uppercase tracking-wider block mb-1">Saved Tariff Points</span>
+            <strong className="text-2xl font-serif text-white">{totalPoints} UCAS Points</strong>
           </div>
 
-          <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider block">Shortlisted Universities</span>
-            <strong className="text-xl font-serif text-emerald-400">{profile.draftlist?.length || 0} Universities Saved</strong>
+          <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-xs">
+            <span className="text-xs text-indigo-100 uppercase tracking-wider block mb-1">Shortlisted Universities</span>
+            <strong className="text-2xl font-serif text-white">{profile.draftlist?.length || 0} Target Universities</strong>
           </div>
         </div>
 
         <div className="pt-2 flex flex-wrap gap-3">
-          <Link href="/profile" className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg transition-colors">
-            Edit Student Profile
+          <Link href="/action-plan" className="px-6 py-3 bg-white hover:bg-indigo-50 text-indigo-600 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-2">
+            <Calendar size={16} /> Open Action Plan Checklists
           </Link>
-          <Link href="/action-plan" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-lg transition-colors border border-slate-700">
-            View Action Plan Calendar
+          <Link href="/profile" className="px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-bold text-xs rounded-xl transition-all border border-white/30 flex items-center gap-2">
+            <User size={16} /> Edit Profile & Enrolled Subjects
           </Link>
         </div>
       </div>
 
       {/* Tools Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {TOOLS.map((tool) => (
           <Link 
             href={tool.href} 
             key={tool.title} 
-            className="group flex flex-col p-6 bg-card border border-border shadow-sm hover:border-blue-600 hover:shadow-lg transition-all duration-300 rounded-2xl"
+            className="group flex flex-col p-6 bg-card border border-border shadow-xs hover:border-indigo-600 hover:shadow-md transition-all duration-300 rounded-2xl"
           >
             <div className="flex items-center justify-between mb-4">
               <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border ${tool.color}`}>
                 {tool.badge}
               </span>
-              <ArrowRight size={16} className="text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight size={16} className="text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
             </div>
 
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-indigo-600 transition-colors">
               {tool.title}
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
