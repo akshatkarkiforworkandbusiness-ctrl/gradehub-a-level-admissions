@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
+import { Sidebar } from "@/components/sidebar";
 import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { GoogleAnalytics } from "@/components/google-analytics";
@@ -19,12 +19,12 @@ const sourceSerif4 = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "AfterALevel.com | Premium A-Level & University Utility Platform",
-  description: "Calculate UCAS points, predict A-Level grades, convert to US GPA, and check university requirements. The ultimate toolkit for A-Level and international students.",
+  title: "GradeHub | Premium A-Level & University Admissions Platform",
+  description: "Calculate UCAS points, predict A-Level grades, convert to US GPA, check university requirements, and manage college applications.",
   keywords: ["UCAS points calculator", "A-Level grade predictor", "A-Level to GPA converter", "university requirements checker", "UCAS tariff points", "A-Level subject matcher"],
   openGraph: {
-    title: "AfterALevel.com | A-Level & University Utilities",
-    description: "Calculate UCAS points, predict grades, convert to GPA, and match subjects to degrees.",
+    title: "GradeHub | A-Level Admissions Hub",
+    description: "Calculate UCAS points, predict grades, convert to GPA, and manage college applications.",
     type: "website",
     locale: "en_GB",
   },
@@ -35,11 +35,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Add global schema markup for the site
   const schemaMarkup = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "AfterALevel.com",
+    "name": "GradeHub",
     "description": "Premium A-Level & University Utility Platform",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "All",
@@ -62,14 +61,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaMarkup) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-bg-page text-text-primary selection:bg-ink-navy selection:text-[#FAFAF6] transition-colors duration-300">
+      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-blue-600 selection:text-white transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
+          <div className="min-h-screen flex flex-col">
+            <Sidebar />
+            <div className="lg:pl-64 flex flex-col flex-1 min-h-screen">
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
           </div>
         </ThemeProvider>
         <GoogleAnalytics />

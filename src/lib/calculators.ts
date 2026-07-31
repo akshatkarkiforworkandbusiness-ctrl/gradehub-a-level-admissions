@@ -13,12 +13,12 @@ export const A_LEVEL_POINTS: Record<string, number> = { 'A*': 56, 'A': 48, 'B': 
 export const AS_LEVEL_POINTS: Record<string, number> = { 'a': 20, 'b': 16, 'c': 12, 'd': 10, 'e': 6, 'u': 0 };
 export const EPQ_POINTS: Record<string, number> = { 'A*': 28, 'A': 24, 'B': 20, 'C': 16, 'D': 12, 'E': 8, 'U': 0 };
 
-// Official UCAS Tariff for IB
+// UCAS 2026/2027 Tariff Reference for IB
 export const IB_HL_POINTS: Record<string, number> = { '7': 56, '6': 48, '5': 32, '4': 24, '3': 12, '2': 0, '1': 0 };
 export const IB_SL_POINTS: Record<string, number> = { '7': 28, '6': 24, '5': 16, '4': 12, '3': 6, '2': 0, '1': 0 };
 export const IB_TOK_EE_POINTS: Record<string, number> = { 'A': 12, 'B': 10, 'C': 8, 'D': 6, 'E': 4 };
 
-// Official UCAS Tariff for BTECs
+// UCAS 2026/2027 Tariff Reference for BTECs
 export const BTEC_EXT_POINTS: Record<string, number> = { 
   'D*D*D*': 168, 'D*D*D': 160, 'D*DD': 152, 'DDD': 144, 'DDM': 128, 'DMM': 112, 'MMM': 96, 'MMP': 80, 'MPP': 64, 'PPP': 48 
 };
@@ -29,16 +29,16 @@ export const BTEC_EXT_CERT_POINTS: Record<string, number> = {
   'D*': 56, 'D': 48, 'M': 32, 'P': 16
 };
 
-// Official UCAS Tariff for T-Levels
+// UCAS 2026/2027 Tariff Reference for T-Levels
 export const T_LEVEL_POINTS: Record<string, number> = {
   'Distinction*': 168, 'Distinction': 144, 'Merit': 120, 'Pass (C+)': 96, 'Pass (D/E)': 72
 };
 
-// Official US WES & Fulbright Credential Evaluation Scales for A-Levels
+// US WES Credential Evaluation Scales for A-Levels
 export const GPA_SCALES = {
   unweighted: {
     name: "US Unweighted (WES Standard)",
-    desc: "Official WES / Fulbright 4.0 Scale",
+    desc: "WES 4.0 Scale Standard",
     values: { 'A*': 4.0, 'A': 4.0, 'B': 3.0, 'C': 2.0, 'D': 1.0, 'E': 1.0, 'U': 0.0, 'a': 4.0, 'b': 3.0, 'c': 2.0, 'd': 1.0, 'e': 1.0, 'u': 0.0 }
   },
   weighted: {
@@ -53,30 +53,26 @@ export const GPA_SCALES = {
   }
 };
 
-// International Grade Mappings
 export const CANADA_PERCENTAGE_SCALE: Record<string, number> = {
   'A*': 95, 'A': 86, 'B': 76, 'C': 66, 'D': 56, 'E': 50, 'U': 0
 };
 
-// German Bavarian Formula Scale (1.0 Best - 4.0 Passing)
 export const GERMAN_SCALE: Record<string, number> = {
   'A*': 1.0, 'A': 1.3, 'B': 2.0, 'C': 3.0, 'D': 3.7, 'E': 4.0, 'U': 5.0
 };
 
-// Australian Estimated ATAR Percentile Range for A-Levels Profile (3 A-Levels)
 export function calculateEstimatedAtar(entries: QualificationEntry[]): { atar: string; band: string } {
   const points = calculateTotalUcasPoints(entries);
-  if (points >= 168) return { atar: "99.50+", band: "Top 0.5% (Elite Sandstone / Group of Eight)" };
-  if (points >= 160) return { atar: "98.50+", band: "Top 1.5% (Group of Eight High Honors)" };
-  if (points >= 152) return { atar: "96.00+", band: "Top 4.0% (Group of Eight Unconditional)" };
-  if (points >= 144) return { atar: "93.00+", band: "Top 7.0% (Top Tier Australian Univs)" };
-  if (points >= 136) return { atar: "89.00+", band: "Top 11.0% (Competitive Degree Target)" };
-  if (points >= 128) return { atar: "84.00+", band: "Top 16.0% (Standard Degree Target)" };
-  if (points >= 112) return { atar: "78.00+", band: "Top 22.0% (Broad Entry Target)" };
-  return { atar: "< 75.00", band: "Foundation / Diploma Pathway" };
+  if (points >= 168) return { atar: "99.50+ (Estimated)", band: "Top 0.5% (Estimated Group of Eight Equivalent)" };
+  if (points >= 160) return { atar: "98.50+ (Estimated)", band: "Top 1.5% (Estimated Group of Eight High Honors)" };
+  if (points >= 152) return { atar: "96.00+ (Estimated)", band: "Top 4.0% (Estimated Group of Eight Target)" };
+  if (points >= 144) return { atar: "93.00+ (Estimated)", band: "Top 7.0% (Estimated Australian Degree Target)" };
+  if (points >= 136) return { atar: "89.00+ (Estimated)", band: "Top 11.0% (Estimated Competitive Target)" };
+  if (points >= 128) return { atar: "84.00+ (Estimated)", band: "Top 16.0% (Estimated Standard Target)" };
+  if (points >= 112) return { atar: "78.00+ (Estimated)", band: "Top 22.0% (Estimated Entry Target)" };
+  return { atar: "< 75.00 (Estimated)", band: "Pathway / Foundation Target" };
 }
 
-// Hong Kong & Singapore Direct University Conversion Points
 export function calculateHkSgPoints(entries: QualificationEntry[]): number {
   return entries.reduce((total, entry) => {
     if (entry.type === 'A-Level') {
@@ -218,24 +214,49 @@ export function calculateGermanBavarianGrade(entries: QualificationEntry[]): num
   return Number((total / aLevels.length).toFixed(2));
 }
 
-export function getExactEquivalentOffer(points: number): string {
-  if (points >= 168) return "A*A*A*";
-  if (points >= 160) return "A*A*A";
-  if (points >= 152) return "A*AA";
-  if (points >= 144) return "AAA";
-  if (points >= 136) return "AAB";
-  if (points >= 128) return "ABB";
-  if (points >= 120) return "BBB";
-  if (points >= 112) return "BBC";
-  if (points >= 104) return "BCC";
-  if (points >= 96) return "CCC";
-  if (points >= 88) return "CCD";
-  if (points >= 80) return "CDD";
-  if (points >= 72) return "DDD";
-  if (points >= 64) return "DDE";
-  if (points >= 56) return "EEE";
-  if (points >= 48) return "EE";
-  return "Below EE";
+/**
+ * Calculates exact equivalent A-Level grade offer profile dynamically based on subject count.
+ */
+export function getExactEquivalentOffer(points: number, subjectCount: number = 3): string {
+  if (subjectCount <= 3) {
+    if (points >= 168) return "A*A*A*";
+    if (points >= 160) return "A*A*A";
+    if (points >= 152) return "A*AA";
+    if (points >= 144) return "AAA";
+    if (points >= 136) return "AAB";
+    if (points >= 128) return "ABB";
+    if (points >= 120) return "BBB";
+    if (points >= 112) return "BBC";
+    if (points >= 104) return "BCC";
+    if (points >= 96) return "CCC";
+    if (points >= 88) return "CCD";
+    if (points >= 80) return "CDD";
+    if (points >= 72) return "DDD";
+    if (points >= 64) return "DDE";
+    if (points >= 56) return "EEE";
+    if (points >= 48) return "EE";
+    return "Below EE";
+  } else {
+    // 4 A-Levels profile
+    if (points >= 224) return "A*A*A*A*";
+    if (points >= 216) return "A*A*A*A";
+    if (points >= 208) return "A*A*AA";
+    if (points >= 200) return "A*AAA";
+    if (points >= 192) return "AAAA";
+    if (points >= 184) return "AAAB";
+    if (points >= 176) return "AABB";
+    if (points >= 168) return "AABC";
+    if (points >= 160) return "ABBC";
+    if (points >= 152) return "ABCC";
+    if (points >= 144) return "BBCC";
+    if (points >= 136) return "BCCC";
+    if (points >= 128) return "CCCC";
+    if (points >= 120) return "CCCD";
+    if (points >= 112) return "CCDD";
+    if (points >= 104) return "CDDD";
+    if (points >= 96) return "DDDD";
+    return "Below DDDD";
+  }
 }
 
 export interface UmsPredictionResult {

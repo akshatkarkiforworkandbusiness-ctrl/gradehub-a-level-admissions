@@ -1,198 +1,157 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, X, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Trash2, ArrowRight, Info, CheckCircle2, BookmarkPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { 
-  QualificationType, 
   QualificationEntry, 
-  calculateTotalUcasPoints,
-  getExactEquivalentOffer,
-  getCreditLabel,
-  getCreditWeight,
-  A_LEVEL_POINTS,
-  AS_LEVEL_POINTS,
-  EPQ_POINTS,
-  IB_HL_POINTS,
-  IB_SL_POINTS,
-  IB_TOK_EE_POINTS,
-  BTEC_EXT_POINTS,
-  BTEC_DIP_POINTS,
-  BTEC_EXT_CERT_POINTS,
-  T_LEVEL_POINTS
+  calculateTotalUcasPoints, 
+  getExactEquivalentOffer, 
+  QualificationType,
+  detectSubjectCredit,
+  getCreditWeight
 } from "@/lib/calculators";
+import { getStoredProfile, saveStoredProfile, StudentProfile } from "@/lib/profile-store";
 import { SubjectSearchCombobox } from "@/components/ui/subject-search-combobox";
-import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-const QUAL_OPTIONS: Record<QualificationType, string[]> = {
-  "A-Level": Object.keys(A_LEVEL_POINTS),
-  "AS-Level": Object.keys(AS_LEVEL_POINTS),
-  "EPQ": Object.keys(EPQ_POINTS),
-  "IB-HL": Object.keys(IB_HL_POINTS),
-  "IB-SL": Object.keys(IB_SL_POINTS),
-  "IB-Tok-EE": Object.keys(IB_TOK_EE_POINTS),
-  "BTEC-Ext-Dip": Object.keys(BTEC_EXT_POINTS),
-  "BTEC-Dip": Object.keys(BTEC_DIP_POINTS),
-  "BTEC-Ext-Cert": Object.keys(BTEC_EXT_CERT_POINTS),
-  "T-Level": Object.keys(T_LEVEL_POINTS),
-};
-
-const QUAL_LABELS: Record<QualificationType, string> = {
-  "A-Level": "A-Level (Full Credit)",
-  "AS-Level": "AS-Level (Half Credit)",
-  "EPQ": "EPQ (Half Credit)",
-  "IB-HL": "IB Higher Level",
-  "IB-SL": "IB Standard Level",
-  "IB-Tok-EE": "IB Theory of Knowledge / EE",
-  "BTEC-Ext-Dip": "BTEC Extended Diploma",
-  "BTEC-Dip": "BTEC Diploma",
-  "BTEC-Ext-Cert": "BTEC Extended Certificate",
-  "T-Level": "T-Level Qualification"
-};
-
 export default function UcasCalculator() {
-  const [entries, setEntries] = useState<QualificationEntry[]>([
-    { id: "1", type: "A-Level", subject: "Mathematics", grade: "A", creditType: "Full Credit" }
-  ]);
+  const [profile, setProfile] = useState<StudentProfile>(getStoredProfile());
+  const [entries, setEntries] = useState<QualificationEntry[]>([]);
 
-  const addEntry = () => {
-    setEntries([...entries, { id: Date.now().toString(), type: "A-Level", subject: "", grade: "A", creditType: "Full Credit" }]);
+  useEffect(() => {
+    const prof = getStoredProfile();
+    setProfile(prof);
+    setEntries(prof.entries || []);
+  }, []);
+
+  const saveEntriesToProfile = (newEntries: QualificationEntry[]) => {
+    setEntries(newEntries);
+    saveStoredProfile({ ...profile, entries: newEntries });
+  };
+
+  const addEntry = (subjectQuery: string) => {
+    const { creditType, detectedType, cleanSubject } = detectSubjectCredit(subjectQuery, 'A-Level');
+    const newEntry: QualificationEntry = {
+      id: Date.now().toString(),
+      type: detectedType,
+      subject: cleanSubject || "New Subject",
+      grade: detectedType === 'AS-Level' ? 'a' : 'A',
+      creditType
+    };
+    saveEntriesToProfile([...entries, newEntry]);
+  };
+
+  const updateEntry = (id: string, field: keyof QualificationEntry, value: any) => {
+    const updated = entries.map(e => e.id === id ? { ...e, [field]: value } : e);
+    saveEntriesToProfile(updated);
   };
 
   const removeEntry = (id: string) => {
-    setEntries(entries.filter((e) => e.id !== id));
-  };
-
-  const updateEntry = (id: string, updates: Partial<QualificationEntry>) => {
-    setEntries(entries.map((e) => {
-      if (e.id === id) {
-        const updated = { ...e, ...updates };
-        if (updates.type && QUAL_OPTIONS[updates.type]) {
-          if (!QUAL_OPTIONS[updates.type].includes(updated.grade)) {
-            updated.grade = QUAL_OPTIONS[updates.type][0];
-          }
-        }
-        return updated;
-      }
-      return e;
-    }));
+    saveEntriesToProfile(entries.filter(e => e.id !== id));
   };
 
   const totalPoints = calculateTotalUcasPoints(entries);
-  const equivalentOffer = getExactEquivalentOffer(totalPoints);
+  const aLevelCount = entries.filter(e => e.type === 'A-Level').length || 3;
+  const equivalentOffer = getExactEquivalentOffer(totalPoints, aLevelCount);
 
   return (
-    <main className="max-w-4xl mx-auto px-6 pt-12">
-      <div className="mb-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
-          Official UCAS 2026/2027 Tariff
+    <main className="max-w-6xl mx-auto px-6 pt-12 pb-24">
+      {/* Common App Header */}
+      <div className="mb-10 border-b border-border pb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-xs font-semibold uppercase tracking-wider mb-3">
+          UCAS 2026/2027 Tariff Reference
         </div>
-        <h1 className="text-4xl md:text-5xl font-serif mb-4 text-foreground">Calculate UCAS Points</h1>
-        <p className="text-muted-foreground text-lg">Search any A-Level or AS subject below. The system automatically detects Full Credit vs. Half Credit qualifications.</p>
+        <h1 className="text-4xl md:text-5xl font-serif text-slate-900 dark:text-slate-100 mb-3">UCAS Points Calculator</h1>
+        <p className="text-slate-600 dark:text-slate-400 text-lg max-w-3xl">Calculate total UCAS tariff points for A-Levels, AS-Levels, EPQ, IB, BTECs, and T-Levels with automatic credit weighting.</p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-6">
-          <AnimatePresence>
-            {entries.map((entry) => {
-              const creditLabel = getCreditLabel(entry);
-              const creditWeight = getCreditWeight(entry);
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Left 2 Columns: Add Qualifications */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="p-6 md:p-8 border-border shadow-md space-y-6">
+            <h3 className="font-bold text-base text-foreground border-b border-border pb-3">Search & Add Qualification</h3>
+            
+            <SubjectSearchCombobox onSelectSubject={(subject) => addEntry(subject)} />
 
-              return (
-                <motion.div 
-                  key={entry.id}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="group flex flex-wrap sm:flex-nowrap items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm transition-all hover:border-accent/30 hover:shadow-md"
-                >
-                  <div className="w-full sm:flex-1 min-w-[200px]">
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 flex items-center justify-between">
-                      <span>Search Subject</span>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                        creditLabel === "Full Credit" ? "bg-blue-600/10 text-blue-600" : "bg-amber-500/10 text-amber-600"
-                      }`}>
-                        {creditLabel} ({creditWeight} Credit)
-                      </span>
-                    </label>
-                    <SubjectSearchCombobox
-                      value={entry.subject}
-                      type={entry.type}
-                      creditType={entry.creditType || creditLabel}
-                      onChange={(subj, detectedType, detectedCredit) => {
-                        updateEntry(entry.id, {
-                          subject: subj,
-                          type: detectedType || entry.type,
-                          creditType: detectedCredit || entry.creditType
-                        });
-                      }}
-                      onCreditToggle={(newCredit) => {
-                        const newType = newCredit === "Half Credit" ? "AS-Level" : "A-Level";
-                        updateEntry(entry.id, {
-                          creditType: newCredit,
-                          type: newType
-                        });
-                      }}
-                    />
+            <div className="space-y-4 pt-4 border-t border-border">
+              {entries.map((entry, index) => (
+                <div key={entry.id} className="p-4 rounded-xl border border-border bg-card space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm text-foreground">{entry.subject}</span>
+                    <button onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-red-500 transition-colors p-1">
+                      <Trash2 size={16} />
+                    </button>
                   </div>
 
-                  <div className="w-28 shrink-0">
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Grade</label>
-                    <Select 
-                      value={entry.grade} 
-                      onChange={(e) => updateEntry(entry.id, { grade: e.target.value })} 
-                      className="font-semibold text-accent"
-                    >
-                      {QUAL_OPTIONS[entry.type]?.map(g => <option key={g} value={g}>{g}</option>)}
-                    </Select>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">Qualification Type</label>
+                      <Select value={entry.type} onChange={e => updateEntry(entry.id, "type", e.target.value)}>
+                        <option value="A-Level">A-Level (Full Credit)</option>
+                        <option value="AS-Level">AS-Level (Half Credit)</option>
+                        <option value="EPQ">EPQ (Half Credit)</option>
+                        <option value="IB-HL">IB Higher Level</option>
+                        <option value="IB-SL">IB Standard Level</option>
+                        <option value="IB-Tok-EE">IB ToK / EE</option>
+                        <option value="BTEC-Ext-Dip">BTEC Ext Diploma</option>
+                        <option value="BTEC-Dip">BTEC Diploma</option>
+                        <option value="BTEC-Ext-Cert">BTEC Ext Certificate</option>
+                        <option value="T-Level">T-Level</option>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">Grade Achieved</label>
+                      <Select value={entry.grade} onChange={e => updateEntry(entry.id, "grade", e.target.value)}>
+                        {entry.type === 'AS-Level' ? (
+                          ["a", "b", "c", "d", "e", "u"].map(g => <option key={g} value={g}>{g}</option>)
+                        ) : entry.type === 'T-Level' ? (
+                          ["Distinction*", "Distinction", "Merit", "Pass (C+)", "Pass (D/E)"].map(g => <option key={g} value={g}>{g}</option>)
+                        ) : (
+                          ["A*", "A", "B", "C", "D", "E", "U"].map(g => <option key={g} value={g}>{g}</option>)
+                        )}
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">Credit Weight</label>
+                      <Select value={entry.creditType || 'Full Credit'} onChange={e => updateEntry(entry.id, "creditType", e.target.value)}>
+                        <option value="Full Credit">Full Credit (1.0)</option>
+                        <option value="Half Credit">Half Credit (0.5)</option>
+                      </Select>
+                    </div>
                   </div>
-
-                  <button 
-                    onClick={() => removeEntry(entry.id)}
-                    className="shrink-0 p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors mt-5 sm:mt-0"
-                  >
-                    <X size={20} />
-                  </button>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-
-          <button 
-            onClick={addEntry}
-            className="w-full py-4 border-2 border-dashed border-border rounded-xl text-muted-foreground font-medium hover:border-accent hover:text-accent hover:bg-accent/5 transition-all flex items-center justify-center gap-2"
-          >
-            <Plus size={20} />
-            Add Another Qualification
-          </button>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
 
-        <div>
-          <div className="sticky top-24">
-            <Card className="overflow-hidden">
-              <div className="bg-ink-navy text-[#FAFAF6] p-6 md:p-8">
-                <div className="opacity-80 text-sm font-medium uppercase tracking-wider mb-2">Total UCAS Points</div>
-                <div className="text-6xl font-serif mb-4">{totalPoints}</div>
-                <div className="opacity-90 text-sm flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-accent" />
-                  Equivalent Offer Profile: <span className="text-accent-foreground font-bold">{equivalentOffer}</span>
-                </div>
-              </div>
-              <div className="p-6 space-y-4">
-                <h4 className="font-semibold text-sm text-foreground">Next Steps</h4>
-                <Link href="/requirements-checker" className="flex items-center justify-between text-sm text-muted-foreground hover:text-accent group transition-colors">
-                  Check university requirements
-                  <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                </Link>
-                <Link href="/gpa-converter" className="flex items-center justify-between text-sm text-muted-foreground hover:text-accent group transition-colors">
-                  Convert to US GPA
-                  <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                </Link>
-              </div>
-            </Card>
-          </div>
+        {/* Right Column: Total UCAS Points Display */}
+        <div className="space-y-6">
+          <Card className="p-6 border-border shadow-md bg-slate-900 text-white">
+            <div className="text-xs font-semibold uppercase tracking-wider text-blue-400 mb-2">Total UCAS Tariff Points</div>
+            <div className="text-6xl font-serif font-bold mb-3">{totalPoints} <span className="text-lg font-sans font-normal opacity-80">Points</span></div>
+            
+            <div className="pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-1">
+              <div>Equivalent Grade Offer: <strong className="text-white">{equivalentOffer}</strong></div>
+              <div>Subject Count Evaluated: <strong className="text-white">{aLevelCount} A-Levels</strong></div>
+            </div>
+          </Card>
+
+          <Card className="p-6 border-border shadow-md space-y-3">
+            <h4 className="font-bold text-sm text-foreground">Next Admissions Steps:</h4>
+            <div className="space-y-2 text-xs">
+              <Link href="/gpa-converter" className="flex items-center justify-between p-2.5 rounded-lg bg-muted hover:bg-blue-600/10 hover:text-blue-600 transition-colors">
+                Convert to US / International GPA <ArrowRight size={14} />
+              </Link>
+              <Link href="/university-draftlist" className="flex items-center justify-between p-2.5 rounded-lg bg-muted hover:bg-blue-600/10 hover:text-blue-600 transition-colors">
+                Shortlist Target Universities <ArrowRight size={14} />
+              </Link>
+            </div>
+          </Card>
         </div>
       </div>
     </main>

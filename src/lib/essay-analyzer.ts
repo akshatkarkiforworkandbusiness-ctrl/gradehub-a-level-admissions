@@ -38,36 +38,80 @@ const COMMON_CLICHES = [
   "as a child",
   "it goes without saying",
   "at the end of the day",
-  "last but not least"
+  "last but not least",
+  "hit the ground running",
+  "think outside the box",
+  "my journey began",
+  "a double edged sword",
+  "broaden my horizons",
+  "in today's world",
+  "in order to succeed",
+  "fuelled my interest",
+  "sparked my interest",
+  "food for thought",
+  "through thick and thin",
+  "rollercoaster of emotions",
+  "at a young age",
+  "the sky is the limit",
+  "in a nutshell",
+  "first and foremost",
+  "needless to say",
+  "tip of the iceberg",
+  "when all is said and done",
+  "since time immemorial",
+  "it is clear that",
+  "a blessing in disguise",
+  "open up new avenues",
+  "light at the end of the tunnel",
+  "broadened my perspective",
+  "changed my outlook",
+  "a life-changing experience",
+  "left a lasting impression",
+  "paved the way",
+  "stepping stone",
+  "eye-opening experience",
+  "only time will tell",
+  "in this day and age",
+  "burning passion",
+  "dream come true",
+  "climb the ladder",
+  "world of difference",
+  "strive for perfection"
 ];
 
 const ACTION_VERBS = [
   "analyzed", "architected", "championed", "collaborated", "constructed", 
   "co-ordinated", "designed", "developed", "engineered", "formulated", 
   "implemented", "initiated", "investigated", "optimized", "orchestrated", 
-  "pioneered", "researched", "spearheaded", "synthesized", "transformed"
+  "pioneered", "researched", "spearheaded", "synthesized", "transformed",
+  "calculated", "modeled", "diagnosed", "evaluted", "refactored",
+  "programmed", "quantified", "audited", "benchmarked", "cataloged",
+  "derived", "established", "forecasted", "innovated", "navigated",
+  "overhauled", "projected", "resolved", "simulated", "structured",
+  "tabulated", "validated", "verified", "drafted", "authored",
+  "curated", "demonstrated", "expedited", "facilitated", "generated",
+  "integrated", "maximized", "moderated", "negotiated", "published",
+  "secured", "streamlined", "systematized", "uncovered", "yielded"
 ];
 
 export function evaluateJohnsHopkinsBenchmark(text: string, type: 'ucas' | 'commonapp'): JohnsHopkinsBenchmark {
   const trimmed = text.trim();
   const lower = text.toLowerCase();
   
-  // 1. Hook Score (0-25)
   let hookScore = 18;
   let hookFeedback = "Solid opening.";
-  const hasGenericStart = /since a young age|ever since|dictionary defines|passion for/i.test(lower.slice(0, 100));
+  const hasGenericStart = /since a young age|ever since|dictionary defines|passion for|my journey began/i.test(lower.slice(0, 120));
   if (hasGenericStart) {
     hookScore = 10;
-    hookFeedback = "Opening contains generic cliché ('since a young age' / 'passion for'). Replace with an active micro-scene or specific question.";
+    hookFeedback = "Opening contains generic cliché ('since a young age' / 'passion for'). Replace with an active micro-scene or specific intellectual question.";
   } else if (trimmed.length > 50) {
     hookScore = 24;
     hookFeedback = "Strong narrative hook. Starts with a specific active scene or intellectual spark.";
   }
 
-  // 2. Show, Don't Tell Score (0-25)
   let showTellScore = 15;
   let showTellFeedback = "Contains basic descriptions.";
-  const hasSpecificDetails = /\d+|algorithm|microscope|equation|quantum|framework|hypothesis|protocol|data/i.test(lower);
+  const hasSpecificDetails = /\d+|algorithm|microscope|equation|quantum|framework|hypothesis|protocol|data|code|proof/i.test(lower);
   if (hasSpecificDetails) {
     showTellScore = 23;
     showTellFeedback = "Excellent 'Show, Don't Tell' details. Includes technical/sensory specifics of your work.";
@@ -76,10 +120,9 @@ export function evaluateJohnsHopkinsBenchmark(text: string, type: 'ucas' | 'comm
     showTellFeedback = "Relies on telling ('I worked hard') rather than showing specific project details or code/lab mechanics.";
   }
 
-  // 3. Depth Score (0-25)
   let depthScore = 16;
   let depthFeedback = "Decent analytical depth.";
-  const hasReflection = /learned|realized|transformed|questioned|challenged|discovered/i.test(lower);
+  const hasReflection = /learned|realized|transformed|questioned|challenged|discovered|formulated/i.test(lower);
   if (hasReflection) {
     depthScore = 22;
     depthFeedback = "Strong intellectual reflection. Shows how your thinking evolved through academic exploration.";
@@ -88,7 +131,6 @@ export function evaluateJohnsHopkinsBenchmark(text: string, type: 'ucas' | 'comm
     depthFeedback = "Lacks deep self-reflection. Add what you learned or questioned during the process.";
   }
 
-  // 4. Conclusion Score (0-25)
   let conclusionScore = 15;
   let conclusionFeedback = "Standard summary conclusion.";
   const hasWeakEnding = /in conclusion|to conclude|lastly|summarize/i.test(lower.slice(-150));
@@ -103,8 +145,8 @@ export function evaluateJohnsHopkinsBenchmark(text: string, type: 'ucas' | 'comm
   const overallScore = Math.min(100, Math.round(hookScore + showTellScore + depthScore + conclusionScore));
 
   const exemplarTip = type === 'ucas'
-    ? "Johns Hopkins Exemplar Rule: 75% of your statement should focus on academic engagement (super-curricular reading, lab work, research papers) and 25% on personal reflection & transferable skills."
-    : "Johns Hopkins 'Essays That Worked' Rule: Focus on a small, specific moment (a single experiment, coding bug, or community interaction) and reveal how your problem-solving mindset operates.";
+    ? "UCAS Exemplar Structure: 75% of your statement should focus on academic engagement (super-curricular reading, lab work, research papers) and 25% on personal reflection & transferable skills."
+    : "Common App Essay Rubric: Focus on a small, specific moment (a single experiment, coding bug, or community interaction) and reveal how your problem-solving mindset operates.";
 
   return {
     overallScore,
@@ -178,7 +220,7 @@ export function analyzeEssay(text: string, type: 'ucas' | 'commonapp' = 'ucas'):
   }
 
   if (jhuBenchmark.hookScore < 15) {
-    recommendations.push("Rewrite opening paragraph to model Johns Hopkins 'micro-scene' hook technique.");
+    recommendations.push("Rewrite opening paragraph to model specific active micro-scene hook technique.");
   }
 
   return {

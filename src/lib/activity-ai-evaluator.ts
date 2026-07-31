@@ -21,7 +21,7 @@ export const COURSE_RECOMMENDATIONS_DATABASE: Record<string, CourseRecommendatio
   "Medicine": [
     { title: "Care Home / Hospice Clinical Volunteering", category: "Volunteering / Leadership", description: "Commit to 6 months of weekly care volunteering to demonstrate long-term empathy and patient communication skills.", impactLevel: "Essential" },
     { title: "BSMS / RCGP Virtual Medical Work Experience", category: "Super-Curricular Research", description: "Complete Royal College of General Practitioners virtual shadowing modules to gain primary care insights.", impactLevel: "Essential" },
-    { title: "Medical Ethics Essay Competition (St John's / Cambridge)", category: "Competition / Olympiad", description: "Write a essay exploring bioethical dilemmas such as organ allocation or gene editing.", impactLevel: "High Impact" }
+    { title: "Medical Ethics Essay Competition (St John's / Cambridge)", category: "Competition / Olympiad", description: "Write an essay exploring bioethical dilemmas such as organ allocation or gene editing.", impactLevel: "High Impact" }
   ],
   "Engineering": [
     { title: "CREST Gold Award Project", category: "Project / Project Building", description: "Design, build, and test a physical prototype (e.g., automated solar tracker or CAD structure) following 70+ hours of engineering.", impactLevel: "High Impact" },
@@ -37,6 +37,54 @@ export const COURSE_RECOMMENDATIONS_DATABASE: Record<string, CourseRecommendatio
     { title: "Royal Economic Society (RES) Essay Competition", category: "Competition / Olympiad", description: "Write an analytical paper on inflation, trade policy, or behavioral economics for RES.", impactLevel: "High Impact" },
     { title: "Stock & Macroeconomic Portfolio Model", category: "Project / Project Building", description: "Build a Python or Excel econometric model assessing central bank interest rate impacts on market volatility.", impactLevel: "Essential" },
     { title: "Economics Book Deep-Dive & Review", category: "Super-Curricular Research", description: "Critique 'Thinking, Fast and Slow' or 'Freakonomics' and relate findings to real-world policy.", impactLevel: "Essential" }
+  ],
+  "Business & Management": [
+    { title: "Young Enterprise Student Company Founder", category: "Project / Project Building", description: "Launch and manage a real student micro-business, managing cash flows, marketing, and product inventory.", impactLevel: "Essential" },
+    { title: "Wharton High School Investment Competition", category: "Competition / Olympiad", description: "Compete in simulated portfolio management and investment strategy creation.", impactLevel: "High Impact" }
+  ],
+  "Psychology": [
+    { title: "Independent Cognitive Research Project", category: "Super-Curricular Research", description: "Conduct a survey-based study on memory retention or screen-time impacts following BPS ethics guidelines.", impactLevel: "Essential" },
+    { title: "Mental Health Advocacy Peer Counseling", category: "Volunteering / Leadership", description: "Complete peer listening training and lead mental health awareness workshops in school.", impactLevel: "High Impact" }
+  ],
+  "Architecture": [
+    { title: "Architectural Physical Portfolio & CAD Blueprints", category: "Project / Project Building", description: "Create 10 physical sketch models and 3D Blender/AutoCAD renders analyzing urban spatial design.", impactLevel: "Essential" },
+    { title: "RIBA Student Design Competition", category: "Competition / Olympiad", description: "Submit sustainable urban housing designs for Royal Institute of British Architects youth awards.", impactLevel: "High Impact" }
+  ],
+  "Mathematics": [
+    { title: "UKMT Senior Mathematical Challenge (SMC/BMO)", category: "Competition / Olympiad", description: "Prepare for British Mathematical Olympiad proof-based problems.", impactLevel: "Essential" },
+    { title: "Pure Math Proofs & Latex Monograph", category: "Super-Curricular Research", description: "Write a 10-page LaTeX paper explaining group theory or prime distribution theorems.", impactLevel: "High Impact" }
+  ],
+  "Physics": [
+    { title: "British Physics Olympiad (BPhO)", category: "Competition / Olympiad", description: "Solve advanced mechanics and electromagnetism Olympiad paper questions.", impactLevel: "Essential" },
+    { title: "Astrophysics Sensor Data Analysis", category: "Project / Project Building", description: "Analyze NASA open-source exoplanet light curves using Python and matplotlib.", impactLevel: "High Impact" }
+  ],
+  "Chemistry": [
+    { title: "UK Chemistry Olympiad (UKChO)", category: "Competition / Olympiad", description: "Compete in Royal Society of Chemistry advanced thermodynamics and organic synthesis challenge.", impactLevel: "Essential" },
+    { title: "Spectroscopy & Organic Synthesis Journal", category: "Super-Curricular Research", description: "Synthesize and analyze NMR/IR spectrums of common household compounds in lab.", impactLevel: "High Impact" }
+  ],
+  "Biological & Biomedical Sciences": [
+    { title: "Intermediate Biology Olympiad", category: "Competition / Olympiad", description: "Compete in UKBC cellular biology and genetics Olympiad paper.", impactLevel: "Essential" },
+    { title: "Genomics Data Mining (NCBI / BLAST)", category: "Project / Project Building", description: "Perform sequence alignments on viral mutations using NCBI databases.", impactLevel: "High Impact" }
+  ],
+  "History": [
+    { title: "Historical Association Essay Competition", category: "Competition / Olympiad", description: "Write a 2,500-word historiographical essay analyzing primary source reliability.", impactLevel: "Essential" },
+    { title: "Local Archives Research & Oral History Log", category: "Super-Curricular Research", description: "Digitize and curate oral interviews from local historical archives.", impactLevel: "High Impact" }
+  ],
+  "Politics & International Relations": [
+    { title: "Model United Nations (MUN) Secretary-General", category: "Volunteering / Leadership", description: "Chair committee debates and draft resolution papers on international security.", impactLevel: "Essential" },
+    { title: "Policy Whitepaper on Local Governance", category: "Super-Curricular Research", description: "Publish a 15-page policy proposal on municipal voting engagement.", impactLevel: "High Impact" }
+  ],
+  "Geography & Environmental Science": [
+    { title: "GIS Mapping & Microclimate Study", category: "Project / Project Building", description: "Use QGIS software to map urban heat island effects across local neighborhoods.", impactLevel: "Essential" },
+    { title: "Royal Geographical Society Young Geographer", category: "Competition / Olympiad", description: "Submit climate adaptation spatial plans for RGS competition.", impactLevel: "High Impact" }
+  ],
+  "English Literature": [
+    { title: "National Youth Poetry / Essay Prize", category: "Competition / Olympiad", description: "Submit critical essays analyzing modernist poetry or post-colonial prose.", impactLevel: "Essential" },
+    { title: "Literary Journal Editor-in-Chief", category: "Project / Project Building", description: "Curate and publish a termly 40-page student literary magazine.", impactLevel: "High Impact" }
+  ],
+  "Languages & Linguistics": [
+    { title: "UK Linguistics Olympiad (UKLO)", category: "Competition / Olympiad", description: "Solve code-breaking and syntax pattern puzzles in unfamiliar languages.", impactLevel: "Essential" },
+    { title: "Bilingual Translation & Cultural Critique", category: "Super-Curricular Research", description: "Translate foreign news media and write comparative linguistic reviews.", impactLevel: "High Impact" }
   ]
 };
 
@@ -49,20 +97,20 @@ export function evaluateActivity(
   const desc = description.trim();
   const descLower = desc.toLowerCase();
   
-  let score = 50;
+  let score = 40;
   const strengths: string[] = [];
   const improvements: string[] = [];
 
-  // Tier base score
-  if (tier === 'Tier 1') score += 35;
-  else if (tier === 'Tier 2') score += 25;
-  else if (tier === 'Tier 3') score += 15;
+  // Tier weighting (Balanced so self-reported tier doesn't dominate blindly)
+  if (tier === 'Tier 1') score += 20;
+  else if (tier === 'Tier 2') score += 15;
+  else if (tier === 'Tier 3') score += 10;
   else score += 5;
 
   // Quantitative metrics check
   const hasNumbers = /\d+/.test(desc);
   if (hasNumbers) {
-    score += 10;
+    score += 15;
     strengths.push("Quantifies impact with numerical evidence (e.g. students helped, funds raised, % increase).");
   } else {
     improvements.push("Add quantitative metrics (e.g., 'raised $2,500', 'managed 12 peers', 'reached 500+ users').");
@@ -71,16 +119,16 @@ export function evaluateActivity(
   // Leadership role check
   const isLeader = /founder|president|lead|director|captain|head|editor/i.test(role);
   if (isLeader) {
-    score += 10;
+    score += 15;
     strengths.push("Demonstrates active leadership and organizational ownership.");
   } else {
     improvements.push("Elevate role description (e.g. from 'Member' to 'Lead Organizer' or 'Project Coordinator').");
   }
 
   // Action verbs check
-  const hasActionVerb = /spearheaded|engineered|architected|initiated|transformed|analyzed|organized|co-ordinated/i.test(descLower);
+  const hasActionVerb = /spearheaded|engineered|architected|initiated|transformed|analyzed|organized|co-ordinated|calculated|formulated/i.test(descLower);
   if (hasActionVerb) {
-    score += 5;
+    score += 10;
     strengths.push("Uses high-impact active verbs to open sentences.");
   } else {
     improvements.push("Start description with strong action verbs (e.g. 'Spearheaded', 'Engineered', 'Initiated').");

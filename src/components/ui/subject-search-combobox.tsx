@@ -27,18 +27,20 @@ const ALL_SUBJECTS = [
 ];
 
 interface SubjectSearchComboboxProps {
-  value: string;
+  value?: string;
   type?: QualificationType;
   creditType?: CreditType;
-  onChange: (subject: string, detectedType?: QualificationType, detectedCredit?: CreditType) => void;
+  onChange?: (subject: string, detectedType?: QualificationType, detectedCredit?: CreditType) => void;
+  onSelectSubject?: (subject: string) => void;
   onCreditToggle?: (creditType: CreditType) => void;
 }
 
 export function SubjectSearchCombobox({
-  value,
+  value = "",
   type = "A-Level",
   creditType = "Full Credit",
   onChange,
+  onSelectSubject,
   onCreditToggle
 }: SubjectSearchComboboxProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,19 +67,24 @@ export function SubjectSearchCombobox({
     setIsOpen(true);
 
     const detected = detectSubjectCredit(text, type);
-    onChange(detected.cleanSubject, detected.detectedType, detected.creditType);
+    if (onChange) {
+      onChange(detected.cleanSubject, detected.detectedType, detected.creditType);
+    }
   };
 
   const handleSelectSubject = (subject: string, selectedCredit: CreditType = creditType) => {
     setSearchQuery(subject);
     setIsOpen(false);
     
-    // Automatic credit determination
     const isEpq = subject.toLowerCase().includes("epq") || subject.toLowerCase().includes("extended project");
     const finalCredit = isEpq ? "Half Credit" : selectedCredit;
     const finalType = isEpq ? "EPQ" : (finalCredit === "Half Credit" ? "AS-Level" : "A-Level");
     
-    onChange(subject, finalType, finalCredit);
+    if (onSelectSubject) {
+      onSelectSubject(subject);
+    } else if (onChange) {
+      onChange(subject, finalType, finalCredit);
+    }
   };
 
   const filteredSubjects = ALL_SUBJECTS.filter(s => 
@@ -97,7 +104,6 @@ export function SubjectSearchCombobox({
           className="w-full h-11 pl-9 pr-24 rounded-xl border border-border bg-background text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
         />
         
-        {/* Instant Credit Badge / Toggle inside input */}
         <div className="absolute right-2 flex items-center gap-1">
           <button
             type="button"
@@ -106,7 +112,7 @@ export function SubjectSearchCombobox({
               const newCredit = creditType === "Full Credit" ? "Half Credit" : "Full Credit";
               if (onCreditToggle) {
                 onCreditToggle(newCredit);
-              } else {
+              } else if (onChange) {
                 const newType = newCredit === "Half Credit" ? "AS-Level" : "A-Level";
                 onChange(searchQuery, newType, newCredit);
               }
