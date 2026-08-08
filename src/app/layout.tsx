@@ -19,12 +19,12 @@ const sourceSerif4 = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "GradeHub | Premium A-Level & University Admissions Platform",
-  description: "Calculate UCAS points, predict A-Level grades, convert to US GPA, check university requirements, and manage college applications.",
-  keywords: ["UCAS points calculator", "A-Level grade predictor", "A-Level to GPA converter", "university requirements checker", "UCAS tariff points", "A-Level subject matcher"],
+  title: "GradeHub | Global A-Level & University Admissions Platform",
+  description: "Calculate UCAS points, predict A-Level grades, convert to US GPA, check university requirements, and manage college applications for universities worldwide.",
+  keywords: ["UCAS points calculator", "A-Level grade predictor", "A-Level to GPA converter", "university requirements checker", "UCAS tariff points", "A-Level subject matcher", "global university admissions"],
   openGraph: {
-    title: "GradeHub | A-Level Admissions Hub",
-    description: "Calculate UCAS points, predict grades, convert to GPA, and manage college applications.",
+    title: "GradeHub | Global A-Level Admissions Hub",
+    description: "Calculate UCAS points, predict grades, convert to GPA, and manage college applications for universities worldwide.",
     type: "website",
     locale: "en_GB",
   },
@@ -39,7 +39,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "GradeHub",
-    "description": "Premium A-Level & University Utility Platform",
+    "description": "Global A-Level & University Admissions Platform",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "All",
     "offers": {

@@ -44,6 +44,7 @@ export default function UniversityDraftlist() {
   const addPresetUniversity = (name: string) => {
     const uni = UNIFIED_UNIVERSITY_DATASET.find(u => u.name === name);
     if (!uni) return;
+    if (draftlist.some(u => u.name === uni.name)) return;
     const cat = determineCategory(uni.ucasPoints, userPoints);
     const item: UniversityItem = {
       id: Date.now().toString(),

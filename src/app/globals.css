@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Design System — Editorial Ink
+ * Design System — GradeHub Global Admissions
  */
 
 @theme inline {
@@ -38,8 +38,8 @@
     --text-secondary: #475569;
     --ink-navy: #1E293B;
     --ink-navy-foreground: #F8FAFC;
-    --ink-red: #0EA5E9;
-    --ink-red-text: #0EA5E9;
+    --ink-red: #4F46E5;
+    --ink-red-text: #4F46E5;
   }
 
   .dark {
@@ -50,8 +50,8 @@
     --text-secondary: #94A3B8;
     --ink-navy: #F1F5F9;
     --ink-navy-foreground: #0F172A;
-    --ink-red: #38BDF8;
-    --ink-red-text: #38BDF8;
+    --ink-red: #818CF8;
+    --ink-red-text: #818CF8;
   }
 }
 
@@ -71,6 +71,11 @@
   input[type="number"] {
     -moz-appearance: textfield;
   }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer utilities {
@@ -86,6 +91,16 @@
     @apply bg-bg-surface border border-border text-text-primary placeholder:text-text-secondary
            focus:border-ink-navy focus:ring-2 focus:ring-ink-navy/20 focus:outline-none transition-all;
   }
+
+  /* Common App inspired card hover */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-indigo-600/5 hover:border-indigo-300 dark:hover:border-indigo-500/50;
+  }
+
+  /* Gradient text utility */
+  .gradient-text {
+    @apply bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent;
+  }
 }
 
 /* Smooth theme transitions */
@@ -97,4 +112,26 @@ html {
 .dark select option {
   background-color: var(--bg-surface);
   color: var(--text-primary);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

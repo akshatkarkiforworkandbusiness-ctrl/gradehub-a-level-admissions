@@ -37,11 +37,11 @@ export function Sidebar() {
 
   const navGroups = [
     {
-      groupName: "My Grades & Projections",
+      groupName: "My Grades & Scores",
       badgeText: `${profile.entries?.length || 0} Subjects`,
       items: [
         { href: "/ucas-calculator", label: "UCAS Points Calculator", icon: Calculator },
-        { href: "/grade-predictor", label: "Grade Predictor & UMS", icon: LineChart },
+        { href: "/grade-predictor", label: "Grade Predictor", icon: LineChart },
         { href: "/gpa-converter", label: "Global GPA Converter", icon: Globe }
       ]
     },
@@ -49,27 +49,27 @@ export function Sidebar() {
       groupName: "Find Universities",
       badgeText: `${profile.draftlist?.length || 0} Saved`,
       items: [
-        { href: "/subject-matcher", label: "Degree Subject Matcher", icon: BookOpen },
+        { href: "/subject-matcher", label: "Subject Matcher", icon: BookOpen },
         { href: "/requirements-checker", label: "Requirements Checker", icon: Building2 },
-        { href: "/tariff-search", label: "Tariff Point Lookup", icon: Search },
+        { href: "/tariff-search", label: "Tariff Directory", icon: Search },
         { href: "/university-draftlist", label: "University Draftlist", icon: BookmarkPlus }
       ]
     },
     {
-      groupName: "Application Guidance",
-      badgeText: "AI Feedback",
+      groupName: "Application Tools",
+      badgeText: "AI-Powered",
       items: [
-        { href: "/essay-reviewer", label: "Essay Structure Reviewer", icon: FileText },
-        { href: "/extracurricular-guide", label: "Activity Heuristic Advisor", icon: Award }
+        { href: "/essay-reviewer", label: "Essay Reviewer", icon: FileText },
+        { href: "/extracurricular-guide", label: "Activity Advisor", icon: Award }
       ]
     },
     {
-      groupName: "Timeline & Strategy",
+      groupName: "Planning & Strategy",
       badgeText: profile.level,
       items: [
         { href: "/profile", label: "Student Profile", icon: User },
-        { href: "/action-plan", label: "Action Plan & Exam Calendar", icon: Calendar },
-        { href: "/results-day-guide", label: "August Results Day Wizard", icon: Zap }
+        { href: "/action-plan", label: "Action Plan", icon: Calendar },
+        { href: "/results-day-guide", label: "Results Day Guide", icon: Zap }
       ]
     }
   ];
@@ -79,8 +79,28 @@ export function Sidebar() {
       {/* Mobile Header Bar */}
       <div className="lg:hidden sticky top-0 z-50 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 h-14 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center font-serif font-bold text-sm shadow-xs">G</div>
-          <span className="font-serif font-bold text-lg text-slate-900 dark:text-white">GradeHub</span>
+          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-xs flex-shrink-0">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <defs>
+                <linearGradient id="mobGlobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#4F46E5'}}/>
+                  <stop offset="100%" style={{stopColor:'#2563EB'}}/>
+                </linearGradient>
+              </defs>
+              <circle cx="24" cy="24" r="23" fill="url(#mobGlobeGrad)"/>
+              <circle cx="24" cy="24" r="16" fill="none" stroke="white" strokeWidth="1.5" opacity="0.9"/>
+              <ellipse cx="24" cy="24" rx="8" ry="16" fill="none" stroke="white" strokeWidth="1" opacity="0.5"/>
+              <ellipse cx="24" cy="24" rx="16" ry="8" fill="none" stroke="white" strokeWidth="1" opacity="0.5"/>
+              <g transform="translate(16, 14)">
+                <polygon points="8,2 16,6 8,10 0,6" fill="white"/>
+                <polygon points="8,0 11,2 8,4 5,2" fill="white" opacity="0.8"/>
+                <line x1="14" y1="6" x2="18" y2="12" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="18" cy="13" r="1.5" fill="#F59E0B"/>
+              </g>
+              <polygon points="24,8 28,16 20,16" fill="white" opacity="0.6"/>
+            </svg>
+          </div>
+          <span className="font-serif font-bold text-lg text-slate-900 dark:text-white">Grade<span className="text-indigo-600">Hub</span></span>
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -98,12 +118,30 @@ export function Sidebar() {
         <div className="p-4 flex flex-col h-full overflow-y-auto">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 px-2 py-3 mb-4 group border-b border-slate-200 dark:border-slate-800 pb-4">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center font-serif font-bold text-xl group-hover:opacity-95 transition-opacity shadow-md">
-              G
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow flex-shrink-0">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                <defs>
+                  <linearGradient id="sbGlobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style={{stopColor:'#4F46E5'}}/>
+                    <stop offset="100%" style={{stopColor:'#2563EB'}}/>
+                  </linearGradient>
+                </defs>
+                <circle cx="24" cy="24" r="23" fill="url(#sbGlobeGrad)"/>
+                <circle cx="24" cy="24" r="16" fill="none" stroke="white" strokeWidth="1.5" opacity="0.9"/>
+                <ellipse cx="24" cy="24" rx="8" ry="16" fill="none" stroke="white" strokeWidth="1" opacity="0.5"/>
+                <ellipse cx="24" cy="24" rx="16" ry="8" fill="none" stroke="white" strokeWidth="1" opacity="0.5"/>
+                <g transform="translate(16, 14)">
+                  <polygon points="8,2 16,6 8,10 0,6" fill="white"/>
+                  <polygon points="8,0 11,2 8,4 5,2" fill="white" opacity="0.8"/>
+                  <line x1="14" y1="6" x2="18" y2="12" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="18" cy="13" r="1.5" fill="#F59E0B"/>
+                </g>
+                <polygon points="24,8 28,16 20,16" fill="white" opacity="0.6"/>
+              </svg>
             </div>
             <div>
-              <div className="font-serif font-bold text-lg text-slate-900 dark:text-white leading-none">GradeHub</div>
-              <div className="text-[9px] uppercase tracking-[0.2em] font-semibold text-indigo-600 dark:text-indigo-400 mt-1">A-Level Admissions</div>
+              <div className="font-serif font-bold text-lg text-slate-900 dark:text-white leading-none">Grade<span className="text-indigo-600 dark:text-indigo-400">Hub</span></div>
+              <div className="text-[9px] uppercase tracking-[0.2em] font-semibold text-indigo-600 dark:text-indigo-400 mt-1">Global Admissions</div>
             </div>
           </Link>
 

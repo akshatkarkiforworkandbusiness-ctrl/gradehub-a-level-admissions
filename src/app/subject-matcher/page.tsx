@@ -100,13 +100,18 @@ export default function SubjectMatcher() {
     if (!userSubjects.includes(sub)) {
       const updated = [...userSubjects, sub];
       setUserSubjects(updated);
-      const entries: QualificationEntry[] = updated.map((s, idx) => ({
-        id: (idx + 1).toString(),
-        type: 'A-Level',
-        subject: s,
-        grade: 'A',
-        creditType: 'Full Credit'
-      }));
+      const existingEntries = profile.entries || [];
+      const existingEntryMap = new Map(existingEntries.map(e => [e.subject, e]));
+      const entries: QualificationEntry[] = updated.map((s, idx) => {
+        const existing = existingEntryMap.get(s);
+        return existing || {
+          id: `sm-${Date.now()}-${idx}`,
+          type: 'A-Level' as const,
+          subject: s,
+          grade: 'A',
+          creditType: 'Full Credit' as const
+        };
+      });
       saveStoredProfile({ ...profile, entries });
     }
   };
@@ -114,13 +119,18 @@ export default function SubjectMatcher() {
   const removeSubject = (sub: string) => {
     const updated = userSubjects.filter(s => s !== sub);
     setUserSubjects(updated);
-    const entries: QualificationEntry[] = updated.map((s, idx) => ({
-      id: (idx + 1).toString(),
-      type: 'A-Level',
-      subject: s,
-      grade: 'A',
-      creditType: 'Full Credit'
-    }));
+    const existingEntries = profile.entries || [];
+    const existingEntryMap = new Map(existingEntries.map(e => [e.subject, e]));
+    const entries: QualificationEntry[] = updated.map((s, idx) => {
+      const existing = existingEntryMap.get(s);
+      return existing || {
+        id: `sm-${Date.now()}-${idx}`,
+        type: 'A-Level' as const,
+        subject: s,
+        grade: 'A',
+        creditType: 'Full Credit' as const
+      };
+    });
     saveStoredProfile({ ...profile, entries });
   };
 

@@ -48,7 +48,6 @@ export default function ReportPage() {
   };
 
   useEffect(() => {
-    document.body.className = "bg-gray-100 text-black";
     const stored = sessionStorage.getItem("predictedReportData");
     if (stored) {
       setData(JSON.parse(stored));

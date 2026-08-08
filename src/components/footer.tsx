@@ -11,20 +11,33 @@ export function Footer() {
           
           <div className="md:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-ink-red to-blue-600 text-white flex items-center justify-center shadow-sm">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-                  <circle cx="12" cy="5" r="2" />
-                  <path d="M10.5 6.5L4 19" />
-                  <path d="M13.5 6.5L20 19" />
-                  <path d="M8.5 14h7" opacity="0.6" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm flex-shrink-0">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                  <defs>
+                    <linearGradient id="ftGlobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{stopColor:'#4F46E5'}}/>
+                      <stop offset="100%" style={{stopColor:'#2563EB'}}/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="24" cy="24" r="23" fill="url(#ftGlobeGrad)"/>
+                  <circle cx="24" cy="24" r="16" fill="none" stroke="white" strokeWidth="1.5" opacity="0.9"/>
+                  <ellipse cx="24" cy="24" rx="8" ry="16" fill="none" stroke="white" strokeWidth="1" opacity="0.5"/>
+                  <ellipse cx="24" cy="24" rx="16" ry="8" fill="none" stroke="white" strokeWidth="1" opacity="0.5"/>
+                  <g transform="translate(16, 14)">
+                    <polygon points="8,2 16,6 8,10 0,6" fill="white"/>
+                    <polygon points="8,0 11,2 8,4 5,2" fill="white" opacity="0.8"/>
+                    <line x1="14" y1="6" x2="18" y2="12" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
+                    <circle cx="18" cy="13" r="1.5" fill="#F59E0B"/>
+                  </g>
+                  <polygon points="24,8 28,16 20,16" fill="white" opacity="0.6"/>
                 </svg>
               </div>
-              <span className="font-bold tracking-tight text-ink-navy text-lg leading-none">
-                After<span className="text-ink-red">A</span>Level<span className="text-ink-red/80 font-semibold ml-[1px]">.com</span>
+              <span className="font-bold tracking-tight text-text-primary text-lg leading-none font-serif">
+                Grade<span className="text-indigo-600">Hub</span>
               </span>
             </Link>
             <p className="text-sm text-text-secondary leading-relaxed max-w-sm mb-6">
-              The ultimate toolkit for A-Level students. Calculate UCAS points, predict grades, convert to US GPA, and explore university requirements globally.
+              The ultimate global admissions toolkit for A-Level students. Calculate UCAS points, predict grades, convert to US GPA, and explore university requirements worldwide.
             </p>
             <ThemeToggle />
           </div>
@@ -54,7 +67,7 @@ export function Footer() {
 
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-secondary">
-            &copy; {currentYear} AfterALevel.com. All rights reserved.
+            &copy; {currentYear} GradeHub. All rights reserved.
           </p>
           <p className="text-xs text-text-secondary/70 text-center md:text-right max-w-md">
             Disclaimer: We are an independent educational tool. Our calculations provide estimates and are not affiliated with or endorsed by UCAS or any university.
